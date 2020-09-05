@@ -37,3 +37,10 @@ fn test_simple_rle_random() {
         assert_eq!(a.to_vec(), c);
     }
 }
+
+#[test]
+fn test_switched_rel() {
+    let a: Vec<u8> = vec![0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 4, 4, 4, 3];
+    let b = rsc::run_length_encoding::switched_rle::encode(&a);
+    assert_eq!(b, [1, 0, 4, 1, 1, 1, 1, 2, 3, 1, 4, 2, 1, 3]);
+}
