@@ -6,7 +6,7 @@ const MAX_LEN: usize = 255;
 const MIN_LEN: usize = 3;
 
 
-pub fn run_length_encode(fin: &[u8], n: usize) -> Vec<u8> {
+pub fn encode(fin: &[u8], n: usize) -> Vec<u8> {
     let mut fout: Vec<u8> = Vec::new();
     assert!(n >= MIN_LEN, "`n` must be > {}.", MIN_LEN); 
     assert!(n <= MAX_LEN,  "`n` must be > {}.", MIN_LEN);
@@ -53,3 +53,7 @@ pub fn run_length_encode(fin: &[u8], n: usize) -> Vec<u8> {
     fout
 }
 
+pub fn decode(fin: &[u8], n: usize) -> Vec<u8> {
+    let mut fout: Vec<u8> = Vec::new();
+    fout
+}
