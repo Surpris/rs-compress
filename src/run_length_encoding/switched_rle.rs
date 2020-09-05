@@ -10,7 +10,7 @@ const MODE_FILL: usize = 0;
 pub fn encode(src: &[u8]) -> Vec<u8> {
     let mut mode: usize = MODE_LITERAL;
     let mut current_index: usize = 0;
-    let mut c: u8 = 0;
+    let mut c: u8 = src[current_index];
     let mut count: usize = 0;
     let mut dst: Vec<u8> = Vec::new();
     while current_index < src.len() {
@@ -54,6 +54,33 @@ pub fn encode(src: &[u8]) -> Vec<u8> {
                 c = c1;
             }
         }
+    }
+    dst
+}
+
+/// decode a byte array
+pub fn decode(src: &[u8]) -> Vec<u8> {
+    let mut mode: usize = MODE_LITERAL;
+    let mut current_index: usize = 0;
+    let mut c: u8 = 0;
+    let mut dst: Vec<u8> = Vec::new();
+    while current_index < src.len() {
+        let num: u8 = src[current_index];
+        if mode == MODE_LITERAL {
+            for _ in 0..num {
+                current_index += 1;
+                if current_index >= src.len() { break; }
+                c = src[current_index];
+                dst.push(c);
+            }
+            if num < MAX_LEN as u8 { mode = MODE_FILL; }
+        } else if mode == MODE_FILL {
+            for _ in 0..num {
+                dst.push(c);
+            }
+            if num < MAX_LEN as u8 { mode = MODE_LITERAL; }
+        }
+        current_index += 1;
     }
     dst
 }
