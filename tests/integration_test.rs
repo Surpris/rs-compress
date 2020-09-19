@@ -6,10 +6,11 @@
 extern crate rs_compress;
 use rs_compress as rsc;
 
+use bit_vec::BitVec;
 use rand::prelude::*;
 
 const SRC_LENGTH: usize = 1000;
-const NBR_LOOPS: usize = 1000;
+const NBR_LOOPS: usize = 100;
 
 #[test]
 fn test_simple_rle_encode() {
@@ -92,5 +93,19 @@ fn test_zle_random() {
         let b = rsc::run_length_encoding::zle::encode(&a);
         let c = rsc::run_length_encoding::zle::decode(&b);
         assert_eq!(a.to_vec(), c);
+    }
+}
+
+#[test]
+fn test_alpha_random() {
+    let mut rng = rand::thread_rng();
+    let mut a = [0u8; SRC_LENGTH];
+    for _ in 0..NBR_LOOPS {
+        rng.fill_bytes(&mut a);
+        for v in a.iter(){
+            let encoded: BitVec = rsc::integer_encoding::alpha::encode(*v);
+            let decoded: u8 = rsc::integer_encoding::alpha::decode(&encoded);
+            assert_eq!(*v, decoded);
+        }
     }
 }
