@@ -58,7 +58,7 @@ pub fn encode(src: &[u8]) -> Vec<u8> {
     dst
 }
 
-/// decode a byte array
+/// decode an encoded byte array
 pub fn decode(src: &[u8]) -> Vec<u8> {
     let mut mode: usize = MODE_LITERAL;
     let mut current_index: usize = 0;

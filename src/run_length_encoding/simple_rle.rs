@@ -53,7 +53,7 @@ pub fn encode(fin: &[u8], n: usize) -> Vec<u8> {
     fout
 }
 
-/// decode a byte array
+/// decode an encoded byte array
 pub fn decode(fin: &[u8], n: usize) -> Vec<u8> {
     assert!(n >= MIN_LEN, "`n` must be > {}.", MIN_LEN); 
     assert!(n <= MAX_LEN,  "`n` must be > {}.", MIN_LEN);
