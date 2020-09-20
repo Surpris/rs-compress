@@ -8,12 +8,13 @@ use bit_vec::BitVec;
 // use rand::prelude::*;
 
 fn main() {
-    let a: Vec<u8> = vec![0, 1, 2, 3, 4, 5];
-    for v in a {
-        println!("Original: {}", v);
-        let encoded: BitVec = rsc::integer_encoding::alpha::encode(v);
-        println!("encoded to {:?}", encoded);
-        let decoded: u8 = rsc::integer_encoding::alpha::decode(&encoded);
-        println!("decoded to {}", decoded);
+    for v in 0..255 {
+        let b: BitVec = rsc::integer_encoding::gamma::encode(v);
+        let c: u8 = rsc::integer_encoding::gamma::decode(&b);
+        println!("{}, {:?}, {}", v, b, c);
     }
+    let v = 255u8;
+    let b: BitVec = rsc::integer_encoding::gamma::encode(v);
+    let c: u8 = rsc::integer_encoding::gamma::decode(&b);
+    println!("{}, {:?}, {}", v, b, c);
 }

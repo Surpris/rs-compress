@@ -109,3 +109,17 @@ fn test_alpha_random() {
         }
     }
 }
+
+#[test]
+fn test_gamma_random() {
+    let mut rng = rand::thread_rng();
+    let mut a = [0u8; SRC_LENGTH];
+    for _ in 0..NBR_LOOPS {
+        rng.fill_bytes(&mut a);
+        for v in a.iter(){
+            let encoded: BitVec = rsc::integer_encoding::gamma::encode(*v);
+            let decoded: u8 = rsc::integer_encoding::gamma::decode(&encoded);
+            assert_eq!(*v, decoded);
+        }
+    }
+}

@@ -16,7 +16,6 @@ pub fn encode(v: u8) -> BitVec {
 
 /// decode an encoded integer
 pub fn decode(bytes: &BitVec) -> u8 {
-    assert!(bytes.len() - 1 <= u8::MAX as usize);
     let mut dst: u8 = 0u8;
     for b_ in bytes.iter() {
         if b_ == true { break; }
