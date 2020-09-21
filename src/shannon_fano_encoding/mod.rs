@@ -3,7 +3,6 @@
 //!
 
 use std::rc::Rc;
-use std::borrow::Borrow;
 pub mod node_tree;
 use node_tree::*;
 
@@ -44,7 +43,6 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
         root = make_tree(&node_table, 0, x - 1, total);
     }
     println!("{:?}", root);
-    // root
 
     // create a code table
     let mut code_table: Vec<(u8, u8)> = vec![(0, 0); MAX_CHAR];
@@ -55,9 +53,13 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
     let dst = write_tree(&root);
 
     // output the code table
-    // for v in src.to_vec() {
-    //     dst.append()
-    // }
+    for v in src.to_vec() {
+        println!(
+            "{}, {}, {}",
+            v, code_table[v as usize].0, code_table[v as usize].1
+        );
+        // dst.append()
+    }
     dst
 }
 

@@ -1,5 +1,5 @@
 //! bit_array_ops
-//! 
+//!
 //! functions for a bit array
 
 /// convert a bit array into a byte arrays
@@ -8,7 +8,7 @@ pub fn to_bytes(src: &[bool]) -> Vec<u8> {
     let n_bytes = src.len() / 8;
     let mut dst: Vec<u8> = Vec::new();
     for ii in 0..n_bytes {
-        dst.push(to_byte(&src[(ii*8)..(ii+1)*8]));
+        dst.push(to_byte(&src[(ii * 8)..(ii + 1) * 8]));
     }
     dst
 }

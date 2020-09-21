@@ -2,11 +2,9 @@
 //!
 //!
 
-use std::fmt;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::rc::Weak;
-// use std::boxed::Box;
 use std::cmp::Ordering;
 
 use crate::utils::byte_array_ops::to_bits;
@@ -85,7 +83,6 @@ impl PartialEq for Node {
 
 /// make a code tree
 pub fn make_tree(node_table: &Vec<Rc<Node>>, low: u32, high: u32, total: u32) -> Rc<Node> {
-    
     assert!(node_table.len() <= MAX_CHAR);
     if low >= high {
         let node = node_table[high as usize].clone();
@@ -131,11 +128,16 @@ pub fn make_code(mut code_table: Vec<(u8, u8)>, node: &Rc<Node>, n: u8, code: u8
         // left: 0
         let code_table = make_code(code_table, &node.children.borrow()[0], n + 1, code << 1);
         // right: 1
-        let code_table = make_code(code_table, &node.children.borrow()[1], n + 1, (code << 1) | 1);
+        let code_table = make_code(
+            code_table,
+            &node.children.borrow()[1],
+            n + 1,
+            (code << 1) | 1,
+        );
         code_table
     } else {
         println!("{}, {}, {}", node.code, n, code);
-        code_table[node.code as usize] =  (n, code);
+        code_table[node.code as usize] = (n, code);
         code_table
     }
 }
