@@ -15,12 +15,8 @@ pub fn encode(v: u8) -> Vec<bool> {
 /// decode an encoded integer
 pub fn decode(mut src: Vec<bool>) -> (u8, Vec<bool>) {
     let mut value = 0u8;
-    let mut dst: Vec<bool> = Vec::new();
     while src.remove(0) == false {
         value += 1;
     }
-    while src.len() > 0 {
-        dst.push(src.remove(0));
-    }
-    (value, dst)
+    (value, src)
 }
