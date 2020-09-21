@@ -27,7 +27,7 @@ pub fn to_byte(src: &[bool]) -> u8 {
 
 /// convert a bit array into a string
 /// with binary expression
-fn to_string(src: &[bool]) -> String {
+pub fn to_string(src: &[bool]) -> String {
     let mut dst = String::new();
     for b_ in src.to_vec() {
         if b_ == false {

@@ -2,11 +2,14 @@
 //!
 //!
 
+use std::fmt;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::rc::Weak;
 // use std::boxed::Box;
 use std::cmp::Ordering;
+
+use crate::utils::byte_array_ops::to_bits;
 
 pub const MAX_CHAR: usize = 256;
 
@@ -82,9 +85,11 @@ impl PartialEq for Node {
 
 /// make a code tree
 pub fn make_tree(node_table: &Vec<Rc<Node>>, low: u32, high: u32, total: u32) -> Rc<Node> {
+    
     assert!(node_table.len() <= MAX_CHAR);
     if low >= high {
         let node = node_table[high as usize].clone();
+        // println!("make tree from {}", node.code);
         node
     } else {
         let half: u32 = total / 2;
@@ -93,12 +98,16 @@ pub fn make_tree(node_table: &Vec<Rc<Node>>, low: u32, high: u32, total: u32) ->
         for ii in low..(high + 1) {
             let p = c;
             c += node_table[ii as usize].count;
-            if (c >= half) && (2 * half < c + p) {
-                c = p;
-                ind = ii - 1;
+            ind = ii;
+            if c >= half {
+                if 2 * half < c + p {
+                    c = p;
+                    ind -= 1;
+                }
                 break;
             }
         }
+        // println!("{}, {}", c, ind);
         let node = Rc::new(Node::new());
 
         // left side
@@ -107,29 +116,40 @@ pub fn make_tree(node_table: &Vec<Rc<Node>>, low: u32, high: u32, total: u32) ->
         *left.parent.borrow_mut() = Rc::downgrade(&node);
 
         // right side
-        let right = make_tree(&node_table, low, ind, c);
+        // println!("{}, {}", total, c);
+        let right = make_tree(&node_table, ind + 1, high, total - c);
         node.children.borrow_mut().push(Rc::clone(&right));
         *right.parent.borrow_mut() = Rc::downgrade(&node);
+        println!("make tree from {}", node.code);
         node
     }
 }
 
-// pub fn make_code(mut code_table: Vec<(u8, u8)>, node: Rc<Node>, n: u8, code: u8) -> (Vec<(u8, u8)>, Rc<Node>) {
-//     if node.parent.borrow_mut().weak_count() == 0 {
-//         let mut left = Rc::new(Node::new());
-//         node.children.borrow_mut().push(Rc::clone(&left));
-//         *left.parent.borrow_mut() = Rc::downgrade(&node);
-//         let (mut code_table, mut left) = make_code(code_table, left, n + 1, code << 1);
+pub fn make_code(mut code_table: Vec<(u8, u8)>, node: &Rc<Node>, n: u8, code: u8) -> Vec<(u8, u8)> {
+    // if a node has children, it is not any leaf.
+    if node.children.borrow_mut().len() > 0 {
+        // left: 0
+        let code_table = make_code(code_table, &node.children.borrow()[0], n + 1, code << 1);
+        // right: 1
+        let code_table = make_code(code_table, &node.children.borrow()[1], n + 1, (code << 1) | 1);
+        code_table
+    } else {
+        println!("{}, {}, {}", node.code, n, code);
+        code_table[node.code as usize] =  (n, code);
+        code_table
+    }
+}
 
-//         let mut right = Rc::new()
-//     } else {
-//         code_table.insert(node.code as usize, (n, code));
-//         (code_table, node)
-//     }
-// }
-
-pub fn write_tree(node: Node) -> Vec<u8> {
-    let dst: Vec<u8> = Vec::new();
+pub fn write_tree(node: &Rc<Node>) -> Vec<bool> {
+    let mut dst: Vec<bool> = Vec::new();
+    if node.children.borrow_mut().len() == 0 {
+        dst.push(true);
+        dst.append(&mut to_bits(node.code));
+    } else {
+        dst.push(false);
+        dst.append(&mut write_tree(&node.children.borrow()[0]));
+        dst.append(&mut write_tree(&node.children.borrow()[1]));
+    }
     dst
 }
 

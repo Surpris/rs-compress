@@ -3,11 +3,12 @@
 //!
 
 use std::rc::Rc;
-
+use std::borrow::Borrow;
 pub mod node_tree;
 use node_tree::*;
 
-pub fn encode(src: &[u8]) -> Rc<Node> {
+pub fn encode(src: &[u8]) -> Vec<bool> {
+    // create a table of frequency of each value
     let mut node_table: Vec<Node> = Vec::new();
     for ii in 0..MAX_CHAR {
         node_table.push(Node::new_with_code(ii as u8));
@@ -15,7 +16,11 @@ pub fn encode(src: &[u8]) -> Rc<Node> {
     for v in src.to_vec() {
         node_table[v as usize].count += 1;
     }
+
+    // sort the frequency table on the descending order
     node_table.sort();
+
+    // create a code tree
     let mut total: u32 = 0;
     let mut x: u32 = 0;
     for n_ in node_table.iter() {
@@ -25,15 +30,35 @@ pub fn encode(src: &[u8]) -> Rc<Node> {
         total += n_.count;
         x += 1;
     }
+    println!("{}, {}", total, x);
     let mut node_table: Vec<Rc<Node>> = node_table.into_iter().map(|x| Rc::new(x)).collect();
     let mut root: Rc<Node> = Rc::new(Node::new());
     if x < 2 {
-        root.children.borrow_mut().push(node_table.remove(0));
-        root.children.borrow_mut().push(node_table.remove(0));
+        let left = node_table.remove(0);
+        root.children.borrow_mut().push(Rc::clone(&left));
+        *left.parent.borrow_mut() = Rc::downgrade(&root);
+        let right = node_table.remove(0);
+        root.children.borrow_mut().push(Rc::clone(&right));
+        *right.parent.borrow_mut() = Rc::downgrade(&root);
     } else {
         root = make_tree(&node_table, 0, x - 1, total);
     }
-    root
+    println!("{:?}", root);
+    // root
+
+    // create a code table
+    let mut code_table: Vec<(u8, u8)> = vec![(0, 0); MAX_CHAR];
+    code_table = make_code(code_table, &root, 0, 0);
+    println!("{:?}, {}", code_table, code_table.len());
+
+    // output the code tree
+    let dst = write_tree(&root);
+
+    // output the code table
+    // for v in src.to_vec() {
+    //     dst.append()
+    // }
+    dst
 }
 
 pub fn decode() {}
