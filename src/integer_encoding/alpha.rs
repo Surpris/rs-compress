@@ -2,11 +2,9 @@
 //! 
 //! alpha encoding
 
-use bit_vec::BitVec;
-
 /// encode an integer
-pub fn encode(v: u8) -> BitVec {
-    let mut dst: BitVec = BitVec::new();
+pub fn encode(v: u8) -> Vec<bool> {
+    let mut dst: Vec<bool> = Vec::new();
     for _ in 0..v {
         dst.push(false);
     }
@@ -15,11 +13,14 @@ pub fn encode(v: u8) -> BitVec {
 }
 
 /// decode an encoded integer
-pub fn decode(bytes: &BitVec) -> u8 {
-    let mut dst: u8 = 0u8;
-    for b_ in bytes.iter() {
-        if b_ == true { break; }
-        dst += 1;
+pub fn decode(mut src: Vec<bool>) -> (u8, Vec<bool>) {
+    let mut value = 0u8;
+    let mut dst: Vec<bool> = Vec::new();
+    while src.remove(0) == false {
+        value += 1;
     }
-    dst
+    while src.len() > 0 {
+        dst.push(src.remove(0));
+    }
+    (value, dst)
 }
