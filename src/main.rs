@@ -8,15 +8,15 @@ use rs_compress as rsc;
 
 fn main() {
     for v in 0..255 {
-        let b: Vec<bool> = rsc::integer_encoding::gamma::encode(v);
+        let b: Vec<bool> = rsc::integer_encoding::delta::encode(v);
         println!("{}, {}", v, print_bool_vec(&b));
-        let (c, dst): (u8, Vec<bool>) = rsc::integer_encoding::gamma::decode(b);
+        let (c, dst): (u8, Vec<bool>) = rsc::integer_encoding::delta::decode(b);
         println!("{}, {}", c, print_bool_vec(&dst));
     }
     let v = 255u8;
-    let b: Vec<bool> = rsc::integer_encoding::gamma::encode(v);
+    let b: Vec<bool> = rsc::integer_encoding::delta::encode(v);
     println!("{}, {}", v, print_bool_vec(&b));
-    let (c, dst): (u8, Vec<bool>) = rsc::integer_encoding::gamma::decode(b);
+    let (c, dst): (u8, Vec<bool>) = rsc::integer_encoding::delta::decode(b);
     println!("{}, {}", c, print_bool_vec(&dst));
 }
 

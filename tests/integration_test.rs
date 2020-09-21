@@ -123,3 +123,17 @@ fn test_gamma_random() {
         }
     }
 }
+
+#[test]
+fn test_delta_random() {
+    let mut rng = rand::thread_rng();
+    let mut a = [0u8; SRC_LENGTH];
+    for _ in 0..NBR_LOOPS {
+        rng.fill_bytes(&mut a);
+        for v in a.iter(){
+            let encoded: Vec<bool> = rsc::integer_encoding::delta::encode(*v);
+            let (decoded, _): (u8, Vec<bool>) = rsc::integer_encoding::delta::decode(encoded);
+            assert_eq!(*v, decoded);
+        }
+    }
+}
