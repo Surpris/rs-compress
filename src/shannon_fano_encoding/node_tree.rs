@@ -8,7 +8,7 @@ use std::rc::Weak;
 // use std::boxed::Box;
 use std::cmp::Ordering;
 
-const MAX_CHAR: usize = 256;
+pub const MAX_CHAR: usize = 256;
 
 #[derive(Debug)]
 pub struct Node {

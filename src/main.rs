@@ -9,33 +9,8 @@ use rsc::shannon_fano_encoding::node_tree::*;
 use std::rc::Rc;
 
 fn main() {
-    let mut node_table: Vec<Node> = Vec::new();
-    for ii in 0..5 {
-        node_table.push(Node::new_with_code(ii as u8));
-    }
-    let src: Vec<u32> = vec![0, 0, 2, 1, 0, 4, 3, 2, 1, 1];
-    for v in src {
-        node_table[v as usize].count += 1;
-    }
-    node_table.sort();
-    let mut total: u32 = 0;
-    let mut x: u32 = 0;
-    for n_ in node_table.iter() {
-        if n_.count == 0 {
-            break;
-        }
-        total += n_.count;
-        x += 1;
-    }
-    // println!("{:?}", node_table);
-    let mut node_table: Vec<Rc<Node>> = node_table.into_iter().map(|x| Rc::new(x)).collect();
-    let mut root: Rc<Node> = Rc::new(Node::new());
-    if x < 2 {
-        root.children.borrow_mut().push(node_table.remove(0));
-        root.children.borrow_mut().push(node_table.remove(0));
-    } else {
-        root = make_tree(&node_table, 0, x - 1, total);
-    }
+    let src: Vec<u8> = vec![0, 0, 2, 1, 0, 4, 3, 2, 1, 1];
+    let root: Rc<Node> = rsc::shannon_fano_encoding::encode(&src);
     println!("{:?}", root);
     // let node = make_tree(&node_table, 0, , high: u32, total: u32)
     // make_code(code_table, node, 0, 0);
