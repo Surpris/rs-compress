@@ -1,7 +1,6 @@
 //! integration_test
-//! 
+//!
 //! test functions
-
 
 extern crate rs_compress;
 use rs_compress as rsc;
@@ -102,7 +101,7 @@ fn test_alpha_random() {
     let mut a = [0u8; SRC_LENGTH];
     for _ in 0..NBR_LOOPS {
         rng.fill_bytes(&mut a);
-        for v in a.iter(){
+        for v in a.iter() {
             let encoded: Vec<bool> = rsc::integer_encoding::alpha::encode(*v);
             let (decoded, _): (u8, Vec<bool>) = rsc::integer_encoding::alpha::decode(encoded);
             assert_eq!(*v, decoded);
@@ -116,7 +115,7 @@ fn test_gamma_random() {
     let mut a = [0u8; SRC_LENGTH];
     for _ in 0..NBR_LOOPS {
         rng.fill_bytes(&mut a);
-        for v in a.iter(){
+        for v in a.iter() {
             let encoded: Vec<bool> = rsc::integer_encoding::gamma::encode(*v);
             let (decoded, _): (u8, Vec<bool>) = rsc::integer_encoding::gamma::decode(encoded);
             assert_eq!(*v, decoded);
@@ -130,7 +129,7 @@ fn test_delta_random() {
     let mut a = [0u8; SRC_LENGTH];
     for _ in 0..NBR_LOOPS {
         rng.fill_bytes(&mut a);
-        for v in a.iter(){
+        for v in a.iter() {
             let encoded: Vec<bool> = rsc::integer_encoding::delta::encode(*v);
             let (decoded, _): (u8, Vec<bool>) = rsc::integer_encoding::delta::decode(encoded);
             assert_eq!(*v, decoded);

@@ -1,5 +1,5 @@
 //! zle
-//! 
+//!
 //! Zero length encoding
 
 /// encode a byte array
@@ -13,7 +13,9 @@ pub fn encode(src: &[u8]) -> Vec<u8> {
             while c == 0 {
                 count += 1;
                 current_index += 1;
-                if current_index >= src.len() { break; }
+                if current_index >= src.len() {
+                    break;
+                }
                 c = src[current_index];
             }
             count += 1;
@@ -49,9 +51,13 @@ pub fn decode(src: &[u8]) -> Vec<u8> {
             buff.push(c);
             loop {
                 current_index += 1;
-                if current_index >= src.len() { break; }
+                if current_index >= src.len() {
+                    break;
+                }
                 c = src[current_index];
-                if c > 1 { break; }
+                if c > 1 {
+                    break;
+                }
                 buff.push(c);
             }
             while let Some(x) = buff.pop() {
@@ -63,9 +69,11 @@ pub fn decode(src: &[u8]) -> Vec<u8> {
         } else {
             if c == 0xff {
                 current_index += 1;
-                if current_index >= src.len() { break; }
+                if current_index >= src.len() {
+                    break;
+                }
                 c = src[current_index];
-                if c == 0x00 { 
+                if c == 0x00 {
                     dst.push(0xfe);
                 } else {
                     dst.push(0xff);

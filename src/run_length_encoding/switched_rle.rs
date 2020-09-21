@@ -1,5 +1,5 @@
 //! switched_rle
-//! 
+//!
 //! Switched run-length encoding
 
 const MAX_LEN: usize = 255;
@@ -20,14 +20,20 @@ pub fn encode(src: &[u8]) -> Vec<u8> {
             buff.push(c);
             while buff.len() < MAX_LEN {
                 current_index += 1;
-                if current_index >= src.len() { break; }
+                if current_index >= src.len() {
+                    break;
+                }
                 c1 = src[current_index];
-                if c1 == c { break; }
+                if c1 == c {
+                    break;
+                }
                 buff.push(c1);
                 c = c1;
             }
             dst.push(buff.len() as u8);
-            for c_ in buff.iter() { dst.push(*c_); }
+            for c_ in buff.iter() {
+                dst.push(*c_);
+            }
             if buff.len() == MAX_LEN {
                 current_index += 1;
                 if current_index < src.len() {
@@ -41,9 +47,13 @@ pub fn encode(src: &[u8]) -> Vec<u8> {
         } else if mode == MODE_FILL {
             while count < MAX_LEN {
                 current_index += 1;
-                if current_index >= src.len() { break; }
+                if current_index >= src.len() {
+                    break;
+                }
                 c1 = src[current_index];
-                if c != c1 { break; }
+                if c != c1 {
+                    break;
+                }
                 count += 1;
             }
             dst.push(count as u8);
@@ -69,16 +79,22 @@ pub fn decode(src: &[u8]) -> Vec<u8> {
         if mode == MODE_LITERAL {
             for _ in 0..num {
                 current_index += 1;
-                if current_index >= src.len() { break; }
+                if current_index >= src.len() {
+                    break;
+                }
                 c = src[current_index];
                 dst.push(c);
             }
-            if num < MAX_LEN as u8 { mode = MODE_FILL; }
+            if num < MAX_LEN as u8 {
+                mode = MODE_FILL;
+            }
         } else if mode == MODE_FILL {
             for _ in 0..num {
                 dst.push(c);
             }
-            if num < MAX_LEN as u8 { mode = MODE_LITERAL; }
+            if num < MAX_LEN as u8 {
+                mode = MODE_LITERAL;
+            }
         }
         current_index += 1;
     }

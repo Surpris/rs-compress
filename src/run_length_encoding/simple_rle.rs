@@ -1,5 +1,5 @@
 //! simple_rle
-//! 
+//!
 //! Simple run-length encoding
 
 const MAX_LEN: usize = 255;
@@ -7,8 +7,8 @@ const MIN_LEN: usize = 3;
 
 /// encode a byte array
 pub fn encode(fin: &[u8], n: usize) -> Vec<u8> {
-    assert!(n >= MIN_LEN, "`n` must be > {}.", MIN_LEN); 
-    assert!(n <= MAX_LEN,  "`n` must be > {}.", MIN_LEN);
+    assert!(n >= MIN_LEN, "`n` must be > {}.", MIN_LEN);
+    assert!(n <= MAX_LEN, "`n` must be > {}.", MIN_LEN);
 
     let mut fout: Vec<u8> = Vec::new();
     let mut current_index: usize = 0;
@@ -21,9 +21,13 @@ pub fn encode(fin: &[u8], n: usize) -> Vec<u8> {
         let mut c1: u8 = 0;
         while num < MAX_LEN + n {
             current_index += 1;
-            if current_index == fin.len() { break; }
+            if current_index == fin.len() {
+                break;
+            }
             c1 = fin[current_index];
-            if c != c1 { break; }
+            if c != c1 {
+                break;
+            }
             num += 1;
         }
         // output the encoded values
@@ -32,8 +36,7 @@ pub fn encode(fin: &[u8], n: usize) -> Vec<u8> {
                 fout.push(c);
             }
             fout.push((num - n) as u8);
-        }
-        else {
+        } else {
             for _ in 0..num {
                 fout.push(c);
             }
@@ -55,8 +58,8 @@ pub fn encode(fin: &[u8], n: usize) -> Vec<u8> {
 
 /// decode an encoded byte array
 pub fn decode(fin: &[u8], n: usize) -> Vec<u8> {
-    assert!(n >= MIN_LEN, "`n` must be > {}.", MIN_LEN); 
-    assert!(n <= MAX_LEN,  "`n` must be > {}.", MIN_LEN);
+    assert!(n >= MIN_LEN, "`n` must be > {}.", MIN_LEN);
+    assert!(n <= MAX_LEN, "`n` must be > {}.", MIN_LEN);
     let mut fout: Vec<u8> = Vec::new();
     let mut current_index: usize = 0;
     let mut c: u8 = fin[current_index];
@@ -68,9 +71,13 @@ pub fn decode(fin: &[u8], n: usize) -> Vec<u8> {
         let mut c1: u8 = 0;
         while num < n {
             current_index += 1;
-            if current_index == fin.len() { break; }
+            if current_index == fin.len() {
+                break;
+            }
             c1 = fin[current_index];
-            if c != c1 { break; }
+            if c != c1 {
+                break;
+            }
             num += 1;
         }
         if num == n {

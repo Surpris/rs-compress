@@ -1,5 +1,5 @@
 //! alpha
-//! 
+//!
 //! alpha encoding
 
 /// encode an integer

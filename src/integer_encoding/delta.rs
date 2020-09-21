@@ -1,5 +1,5 @@
 //! delta
-//! 
+//!
 //! delta encoding
 
 // use bit_vec::BitVec;
@@ -30,7 +30,7 @@ pub fn decode(bits: Vec<bool>) -> (u8, Vec<bool>) {
     let mut value: u32 = 2u32.pow(n_bits as u32);
     for ii in 0..(n_bits) {
         if src.remove(0) == true {
-            value += 2u32.pow((n_bits - ii -1) as u32);
+            value += 2u32.pow((n_bits - ii - 1) as u32);
         }
     }
     ((value - 1) as u8, src)
