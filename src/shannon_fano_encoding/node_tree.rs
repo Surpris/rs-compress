@@ -127,3 +127,12 @@ pub fn make_tree(node_table: &Vec<Rc<Node>>, low: u32, high: u32, total: u32) ->
 //         (code_table, node)
 //     }
 // }
+
+pub fn write_tree(node: Node) -> Vec<u8> {
+    let dst: Vec<u8> = Vec::new();
+    dst
+}
+
+pub fn read_tree(src: &[u8]) -> Node {
+    Node::new()
+}
