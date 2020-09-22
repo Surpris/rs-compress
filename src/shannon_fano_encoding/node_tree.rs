@@ -3,9 +3,9 @@
 //!
 
 use std::cell::RefCell;
+use std::cmp::Ordering;
 use std::rc::Rc;
 use std::rc::Weak;
-use std::cmp::Ordering;
 
 use crate::utils::byte_array_ops::to_bits;
 
@@ -37,28 +37,6 @@ impl Node {
             children: RefCell::new(vec![]),
         }
     }
-
-    // pub fn set_left(&self, node: Node) {
-    //     let left = Rc::new(node);
-    //     if self.children.borrow_mut().len() > 0 {
-    //         self.children.borrow_mut()[0] = Rc::clone(&left);
-    //     } else {
-    //         self.children.borrow_mut().push(Rc::clone(&left));
-    //     }
-    //     *left.parent.borrow_mut() = Rc::downgrade(&Rc::new(*self));
-    // }
-
-    // pub fn set_right(&mut self, node: Node) {
-    //     let right = Rc::new(node);
-    //     if self.children.borrow_mut().len() == 0 {
-    //         self.children.borrow_mut().push(Rc::new(Node::new()));
-    //     } else if self.children.borrow_mut().len() == 1 {
-    //         self.children.borrow_mut().push(Rc::clone(&right));
-    //     } else {
-    //         self.children.borrow_mut()[1] = Rc::clone(&right);
-    //     }
-    //     *right.parent.borrow_mut() = Rc::downgrade(&Rc::new(*self));
-    // }
 }
 
 impl Ord for Node {

@@ -4,6 +4,7 @@
 
 use std::rc::Rc;
 pub mod node_tree;
+use crate::utils::byte_array_ops::to_n_bits;
 use node_tree::*;
 
 pub fn encode(src: &[u8]) -> Vec<bool> {
@@ -50,7 +51,7 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
     println!("{:?}, {}", code_table, code_table.len());
 
     // output the code tree
-    let dst = write_tree(&root);
+    let mut dst = write_tree(&root);
 
     // output the code table
     for v in src.to_vec() {
@@ -58,7 +59,10 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
             "{}, {}, {}",
             v, code_table[v as usize].0, code_table[v as usize].1
         );
-        // dst.append()
+        dst.append(&mut to_n_bits(
+            code_table[v as usize].1,
+            code_table[v as usize].0,
+        ));
     }
     dst
 }
