@@ -7,8 +7,8 @@ use std::cmp::Ordering;
 use std::rc::Rc;
 use std::rc::Weak;
 
-use crate::utils::bit_array_ops::to_byte;
-use crate::utils::byte_array_ops::to_bits;
+use crate::utils::bit_value_ops::to_byte;
+use crate::utils::byte_value_ops::to_bits;
 
 pub const MAX_CHAR: usize = 256;
 
@@ -100,7 +100,7 @@ pub fn make_tree(node_table: &Vec<Rc<Node>>, low: u32, high: u32, total: u32) ->
 /// make a code table
 pub fn make_code(mut code_table: Vec<(u8, u8)>, node: &Rc<Node>, n: u8, code: u8) -> Vec<(u8, u8)> {
     // if a node has children, it is not any leaf.
-    if node.children.borrow_mut().len() > 0 {
+    if node.children.borrow().len() > 0 {
         // left: 0
         let code_table = make_code(code_table, &node.children.borrow()[0], n + 1, code << 1);
         // right: 1
@@ -121,7 +121,7 @@ pub fn make_code(mut code_table: Vec<(u8, u8)>, node: &Rc<Node>, n: u8, code: u8
 /// convert a code tree into a bit array
 pub fn tree_to_bits(node: &Rc<Node>) -> Vec<bool> {
     let mut dst: Vec<bool> = Vec::new();
-    if node.children.borrow_mut().len() == 0 {
+    if node.children.borrow().len() == 0 {
         dst.push(true);
         dst.append(&mut to_bits(node.code));
     } else {
@@ -156,5 +156,17 @@ pub fn bits_to_tree(mut bits: Vec<bool>) -> (Rc<Node>, Vec<bool>) {
         *right.parent.borrow_mut() = Rc::downgrade(&node);
 
         (node, bits)
+    }
+}
+
+pub fn search_leaf(node: Rc<Node>, mut src: Vec<bool>) -> (Rc<Node>, Vec<bool>) {
+    if node.children.borrow().len() > 0 {
+        if src.remove(0) == false {
+            search_leaf(node.children.borrow()[0].clone(), src)
+        } else {
+            search_leaf(node.children.borrow()[1].clone(), src)
+        }
+    } else {
+        (node, src)
     }
 }

@@ -1,6 +1,8 @@
-//! bit_array_ops
+//! bit_value_ops
 //!
-//! functions for a bit array
+//! functions for a bit (array)
+
+use std::mem::size_of;
 
 /// convert a bit array into a byte arrays
 pub fn to_bytes(src: &[bool]) -> Vec<u8> {
@@ -20,6 +22,19 @@ pub fn to_byte(src: &[bool]) -> u8 {
     for jj in 0..8 {
         if src[jj] == true {
             value += 2u8.pow((8 - jj - 1) as u32);
+        }
+    }
+    value
+}
+
+/// convert a bit array into a usize value
+pub fn to_u32(src: &[bool]) -> u32 {
+    let size: usize = 8 * size_of::<u32>();
+    assert_eq!(src.len(), size);
+    let mut value: u32 = 0;
+    for jj in 0..size {
+        if src[jj] == true {
+            value += 2u32.pow((size - jj - 1) as u32);
         }
     }
     value

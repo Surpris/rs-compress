@@ -4,7 +4,9 @@
 
 use std::rc::Rc;
 pub mod node_tree;
-use crate::utils::byte_array_ops::{ary_to_bits, to_n_bits};
+use crate::utils::bit_value_ops;
+use crate::utils::byte_value_ops;
+use crate::utils::u32_value_ops;
 use node_tree::*;
 
 /// encode a byte array
@@ -51,12 +53,14 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
     code_table = make_code(code_table, &root, 0, 0);
     // println!("{:?}, {}", code_table, code_table.len());
 
+    // output the size of the input (bytes)
+    let mut dst = u32_value_ops::to_bits(src.len() as u32);
     // output the code tree
-    let mut dst = tree_to_bits(&root);
+    dst.append(&mut tree_to_bits(&root));
 
     // output the code table
     for v in src.to_vec() {
-        dst.append(&mut to_n_bits(
+        dst.append(&mut byte_value_ops::to_n_bits(
             code_table[v as usize].1,
             code_table[v as usize].0,
         ));
@@ -71,13 +75,26 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
 }
 
 /// decode a byte array
-pub fn decode(src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
+pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
+    // read the size of the original byte array
+    let mut buff: Vec<bool> = Vec::new();
+    for _ in 0..32 {
+        buff.push(src.remove(0));
+    }
+    let mut size = bit_value_ops::to_u32(&buff);
+    println!("{}", size);
+
     // read a code tree
-    let (root, src): (Rc<Node>, Vec<bool>) = bits_to_tree(src);
+    let (root, mut src) = bits_to_tree(src);
     println!("after decode {:?}", root);
 
     // decode the encoded bit array
-    let dst: Vec<u8> = Vec::new();
-
+    let mut dst: Vec<u8> = Vec::new();
+    while size > 0 {
+        let (node, buff) = search_leaf(Rc::clone(&root), src);
+        dst.push(node.code);
+        size -= 1;
+        src = buff;
+    }
     (dst, src)
 }
