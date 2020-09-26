@@ -7,6 +7,7 @@ use std::cmp::Ordering;
 use std::rc::Rc;
 use std::rc::Weak;
 
+use crate::utils::bit_array_ops::to_byte;
 use crate::utils::byte_array_ops::to_bits;
 
 pub const MAX_CHAR: usize = 256;
@@ -64,7 +65,6 @@ pub fn make_tree(node_table: &Vec<Rc<Node>>, low: u32, high: u32, total: u32) ->
     assert!(node_table.len() <= MAX_CHAR);
     if low >= high {
         let node = node_table[high as usize].clone();
-        // println!("make tree from {}", node.code);
         node
     } else {
         let half: u32 = total / 2;
@@ -82,7 +82,6 @@ pub fn make_tree(node_table: &Vec<Rc<Node>>, low: u32, high: u32, total: u32) ->
                 break;
             }
         }
-        // println!("{}, {}", c, ind);
         let node = Rc::new(Node::new());
 
         // left side
@@ -91,15 +90,14 @@ pub fn make_tree(node_table: &Vec<Rc<Node>>, low: u32, high: u32, total: u32) ->
         *left.parent.borrow_mut() = Rc::downgrade(&node);
 
         // right side
-        // println!("{}, {}", total, c);
         let right = make_tree(&node_table, ind + 1, high, total - c);
         node.children.borrow_mut().push(Rc::clone(&right));
         *right.parent.borrow_mut() = Rc::downgrade(&node);
-        println!("make tree from {}", node.code);
         node
     }
 }
 
+/// make a code table
 pub fn make_code(mut code_table: Vec<(u8, u8)>, node: &Rc<Node>, n: u8, code: u8) -> Vec<(u8, u8)> {
     // if a node has children, it is not any leaf.
     if node.children.borrow_mut().len() > 0 {
@@ -114,25 +112,49 @@ pub fn make_code(mut code_table: Vec<(u8, u8)>, node: &Rc<Node>, n: u8, code: u8
         );
         code_table
     } else {
-        println!("{}, {}, {}", node.code, n, code);
+        // println!("{}, {}, {}", node.code, n, code);
         code_table[node.code as usize] = (n, code);
         code_table
     }
 }
 
-pub fn write_tree(node: &Rc<Node>) -> Vec<bool> {
+/// convert a code tree into a bit array
+pub fn tree_to_bits(node: &Rc<Node>) -> Vec<bool> {
     let mut dst: Vec<bool> = Vec::new();
     if node.children.borrow_mut().len() == 0 {
         dst.push(true);
         dst.append(&mut to_bits(node.code));
     } else {
         dst.push(false);
-        dst.append(&mut write_tree(&node.children.borrow()[0]));
-        dst.append(&mut write_tree(&node.children.borrow()[1]));
+        dst.append(&mut tree_to_bits(&node.children.borrow()[0]));
+        dst.append(&mut tree_to_bits(&node.children.borrow()[1]));
     }
     dst
 }
 
-pub fn read_tree(src: &[u8]) -> Node {
-    Node::new()
+/// convert a part of a bit array into a code tree
+pub fn bits_to_tree(mut bits: Vec<bool>) -> (Rc<Node>, Vec<bool>) {
+    let bit_: bool = bits.remove(0);
+    if bit_ == true {
+        let mut code_bits: Vec<bool> = Vec::new();
+        for _ in 0..8 {
+            code_bits.push(bits.remove(0));
+        }
+        let node = Rc::new(Node::new_with_code(to_byte(&code_bits)));
+        (node, bits)
+    } else {
+        let node = Rc::new(Node::new());
+
+        // left side
+        let (left, bits): (Rc<Node>, Vec<bool>) = bits_to_tree(bits);
+        node.children.borrow_mut().push(Rc::clone(&left));
+        *left.parent.borrow_mut() = Rc::downgrade(&node);
+
+        // right side
+        let (right, bits): (Rc<Node>, Vec<bool>) = bits_to_tree(bits);
+        node.children.borrow_mut().push(Rc::clone(&right));
+        *right.parent.borrow_mut() = Rc::downgrade(&node);
+
+        (node, bits)
+    }
 }

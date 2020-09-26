@@ -4,9 +4,10 @@
 
 use std::rc::Rc;
 pub mod node_tree;
-use crate::utils::byte_array_ops::to_n_bits;
+use crate::utils::byte_array_ops::{ary_to_bits, to_n_bits};
 use node_tree::*;
 
+/// encode a byte array
 pub fn encode(src: &[u8]) -> Vec<bool> {
     // create a table of frequency of each value
     let mut node_table: Vec<Node> = Vec::new();
@@ -30,7 +31,7 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
         total += n_.count;
         x += 1;
     }
-    println!("{}, {}", total, x);
+    // println!("{}, {}", total, x);
     let mut node_table: Vec<Rc<Node>> = node_table.into_iter().map(|x| Rc::new(x)).collect();
     let mut root: Rc<Node> = Rc::new(Node::new());
     if x < 2 {
@@ -43,28 +44,40 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
     } else {
         root = make_tree(&node_table, 0, x - 1, total);
     }
-    println!("{:?}", root);
+    println!("before encode {:?}", root);
 
     // create a code table
     let mut code_table: Vec<(u8, u8)> = vec![(0, 0); MAX_CHAR];
     code_table = make_code(code_table, &root, 0, 0);
-    println!("{:?}, {}", code_table, code_table.len());
+    // println!("{:?}, {}", code_table, code_table.len());
 
     // output the code tree
-    let mut dst = write_tree(&root);
+    let mut dst = tree_to_bits(&root);
 
     // output the code table
     for v in src.to_vec() {
-        println!(
-            "{}, {}, {}",
-            v, code_table[v as usize].0, code_table[v as usize].1
-        );
         dst.append(&mut to_n_bits(
             code_table[v as usize].1,
             code_table[v as usize].0,
         ));
     }
+
+    // padding for output in the bytes unit
+    // let q: u8 = (dst.len() % 8) as u8;
+    // if q > 0 {
+    //     dst.append(&mut to_n_bits(q, 8u8 - q));
+    // }
     dst
 }
 
-pub fn decode() {}
+/// decode a byte array
+pub fn decode(src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
+    // read a code tree
+    let (root, src): (Rc<Node>, Vec<bool>) = bits_to_tree(src);
+    println!("after decode {:?}", root);
+
+    // decode the encoded bit array
+    let dst: Vec<u8> = Vec::new();
+
+    (dst, src)
+}
