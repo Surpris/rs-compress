@@ -67,15 +67,15 @@ pub fn make_tree(node_table: &Vec<Rc<Node>>, low: u32, high: u32, total: u32) ->
         let node = node_table[high as usize].clone();
         node
     } else {
-        let half: u32 = total / 2;
+        let half: f32 = total as f32 / 2f32;
         let mut c: u32 = 0;
         let mut ind: u32 = 0;
         for ii in low..(high + 1) {
             let p = c;
             c += node_table[ii as usize].count;
             ind = ii;
-            if c >= half {
-                if 2 * half < c + p {
+            if c as f32 >= half {
+                if 2f32 * half < (c + p) as f32 {
                     c = p;
                     ind -= 1;
                 }
@@ -97,8 +97,27 @@ pub fn make_tree(node_table: &Vec<Rc<Node>>, low: u32, high: u32, total: u32) ->
     }
 }
 
+pub fn print_tree(node: &Rc<Node>, n: u32) {
+    if node.children.borrow().len() > 0 {
+        print_tree(&node.children.borrow()[0], n + 1);
+    }
+    let mut space: String = String::new();
+        for _ in 0..n {
+            space += "    ";
+        }
+        // println!("{}", space);
+    if node.children.borrow().len() == 0 {
+        println!("{}{}", space, node.code);
+    } else {
+        println!("{}{}", space, "*");
+    }
+    if node.children.borrow().len() > 0 {
+        print_tree(&node.children.borrow()[1], n + 1);
+    }
+}
+
 /// make a code table
-pub fn make_code(mut code_table: Vec<(u8, u8)>, node: &Rc<Node>, n: u8, code: u8) -> Vec<(u8, u8)> {
+pub fn make_code(mut code_table: Vec<(u32, u8)>, node: &Rc<Node>, n: u32, code: u8) -> Vec<(u32, u8)> {
     // if a node has children, it is not any leaf.
     if node.children.borrow().len() > 0 {
         // left: 0

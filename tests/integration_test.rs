@@ -136,3 +136,15 @@ fn test_delta_random() {
         }
     }
 }
+
+#[test]
+fn test_shannon_fano_random() {
+    let mut rng = rand::thread_rng();
+    let mut a = [0u8; SRC_LENGTH];
+    for _ in 0..NBR_LOOPS {
+        rng.fill_bytes(&mut a);
+        let encoded: Vec<bool> = rsc::shannon_fano_encoding::encode(&a);
+        let (decoded, _): (Vec<u8>, Vec<bool>) = rsc::shannon_fano_encoding::decode(encoded);
+        assert_eq!(a.to_vec(), decoded);
+    }
+}

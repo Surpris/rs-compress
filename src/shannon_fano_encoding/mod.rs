@@ -5,7 +5,7 @@
 use std::rc::Rc;
 pub mod node_tree;
 use crate::utils::bit_value_ops;
-use crate::utils::byte_value_ops;
+// use crate::utils::byte_value_ops;
 use crate::utils::u32_value_ops;
 use node_tree::*;
 
@@ -33,7 +33,7 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
         total += n_.count;
         x += 1;
     }
-    // println!("{}, {}", total, x);
+    println!("{}, {}", total, x);
     let mut node_table: Vec<Rc<Node>> = node_table.into_iter().map(|x| Rc::new(x)).collect();
     let mut root: Rc<Node> = Rc::new(Node::new());
     if x < 2 {
@@ -46,10 +46,11 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
     } else {
         root = make_tree(&node_table, 0, x - 1, total);
     }
-    println!("before encode {:?}", root);
+    // println!("before encode {:?}", root);
+    print_tree(&root, 0);
 
     // create a code table
-    let mut code_table: Vec<(u8, u8)> = vec![(0, 0); MAX_CHAR];
+    let mut code_table: Vec<(u32, u8)> = vec![(0, 0); MAX_CHAR];
     code_table = make_code(code_table, &root, 0, 0);
     // println!("{:?}, {}", code_table, code_table.len());
 
@@ -60,8 +61,9 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
 
     // output the code table
     for v in src.to_vec() {
-        dst.append(&mut byte_value_ops::to_n_bits(
-            code_table[v as usize].1,
+        println!("{}, {:?}", v, code_table[v as usize]);
+        dst.append(&mut u32_value_ops::to_n_bits(
+            code_table[v as usize].1 as u32,
             code_table[v as usize].0,
         ));
     }
@@ -82,11 +84,11 @@ pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
         buff.push(src.remove(0));
     }
     let mut size = bit_value_ops::to_u32(&buff);
-    println!("{}", size);
+    // println!("{}", size);
 
     // read a code tree
     let (root, mut src) = bits_to_tree(src);
-    println!("after decode {:?}", root);
+    // println!("after decode {:?}", root);
 
     // decode the encoded bit array
     let mut dst: Vec<u8> = Vec::new();
