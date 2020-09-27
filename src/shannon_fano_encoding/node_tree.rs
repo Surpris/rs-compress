@@ -102,10 +102,10 @@ pub fn print_tree(node: &Rc<Node>, n: u32) {
         print_tree(&node.children.borrow()[0], n + 1);
     }
     let mut space: String = String::new();
-        for _ in 0..n {
-            space += "    ";
-        }
-        // println!("{}", space);
+    for _ in 0..n {
+        space += "    ";
+    }
+    // println!("{}", space);
     if node.children.borrow().len() == 0 {
         println!("{}{}", space, node.code);
     } else {
@@ -117,7 +117,12 @@ pub fn print_tree(node: &Rc<Node>, n: u32) {
 }
 
 /// make a code table
-pub fn make_code(mut code_table: Vec<(u32, u8)>, node: &Rc<Node>, n: u32, code: u8) -> Vec<(u32, u8)> {
+pub fn make_code(
+    mut code_table: Vec<(u32, u8)>,
+    node: &Rc<Node>,
+    n: u32,
+    code: u8,
+) -> Vec<(u32, u8)> {
     // if a node has children, it is not any leaf.
     if node.children.borrow().len() > 0 {
         // left: 0

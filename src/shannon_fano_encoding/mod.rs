@@ -47,7 +47,7 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
         root = make_tree(&node_table, 0, x - 1, total);
     }
     // println!("before encode {:?}", root);
-    print_tree(&root, 0);
+    // print_tree(&root, 0);
 
     // create a code table
     let mut code_table: Vec<(u32, u8)> = vec![(0, 0); MAX_CHAR];
@@ -89,6 +89,11 @@ pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
     // read a code tree
     let (root, mut src) = bits_to_tree(src);
     // println!("after decode {:?}", root);
+    // print_tree(&root, 0);
+
+    // create a code table
+    let mut code_table: Vec<(u32, u8)> = vec![(0, 0); MAX_CHAR];
+    code_table = make_code(code_table, &root, 0, 0);
 
     // decode the encoded bit array
     let mut dst: Vec<u8> = Vec::new();
