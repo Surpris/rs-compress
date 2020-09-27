@@ -1,4 +1,4 @@
-//! # Shannon-Fano encoding
+//! # Huffman encoding
 //!
 //!
 
