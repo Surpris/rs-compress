@@ -42,8 +42,11 @@ fn test_b_tree_map() {
     for ii in 0..256 {
         tree.insert(ii, 0);
     }
-    let lower: Vec<(u32, u32)> = tree.range((Included(&0), Included(&128))).map(|(&k, &v)| (k, v)).collect();
-    println!("{:?}",  lower);
+    let lower: Vec<(u32, u32)> = tree
+        .range((Included(&0), Included(&128)))
+        .map(|(&k, &v)| (k, v))
+        .collect();
+    println!("{:?}", lower);
 }
 
 #[allow(dead_code)]

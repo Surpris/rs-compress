@@ -2,9 +2,8 @@
 //!
 //!
 
-
-use std::cmp::Ordering;
 use std::boxed::Box;
+use std::cmp::Ordering;
 use std::collections::{BTreeMap, HashMap};
 use std::ops::Bound::{Included, Unbounded};
 
@@ -23,7 +22,7 @@ impl Tree {
     fn get_count(&self) -> u64 {
         match self {
             &Leaf(n, _) => n,
-            &Node(n, _, _) => n
+            &Node(n, _, _) => n,
         }
     }
     fn new_node() -> Tree {
@@ -69,7 +68,7 @@ pub fn make_tree(freq_table: &Vec<u64>) -> Tree {
     if leaf_map.len() == 1 {
         let keys: Vec<_> = leaf_map.keys().cloned().collect();
         if let Some((_, &Leaf(_, x))) = leaf_map.get_key_value(&keys[0]) {
-            let c = if x == 0 {1} else {0};
+            let c = if x == 0 { 1 } else { 0 };
             leaf_map.insert(total + 1, Leaf(0, c));
         }
     }
@@ -79,7 +78,7 @@ pub fn make_tree(freq_table: &Vec<u64>) -> Tree {
 
 fn make_tree_step(leaf_map: &BTreeMap<u64, Tree>) -> Tree {
     let keys: Vec<_> = leaf_map.keys().cloned().collect();
-    if keys.len() == 1 { 
+    if keys.len() == 1 {
         if let Some((_, &Leaf(c, x))) = leaf_map.get_key_value(&keys[0]) {
             return Leaf(c, x);
         } else {
@@ -95,7 +94,7 @@ fn make_tree_step(leaf_map: &BTreeMap<u64, Tree>) -> Tree {
 
     // let mut left_map: BTreeMap<u64, Tree> = BTreeMap::new();
     // for (&key, &value) in leaf_map.range((Unbounded, Included(&center))) {}
-    
+
     // let left: Tree = make_tree_step(&left_map);
     Tree::new_node()
 }

@@ -3,8 +3,8 @@
 //!
 
 use std::rc::Rc;
-pub mod tree;
 pub mod node_tree;
+pub mod tree;
 use crate::utils::bit_value_ops;
 // use crate::utils::byte_value_ops;
 use crate::utils::u32_value_ops;

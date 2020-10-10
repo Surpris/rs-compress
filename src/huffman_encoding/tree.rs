@@ -2,8 +2,8 @@
 //!
 //!
 
-use std::cmp::Ordering;
 use std::boxed::Box;
+use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
 
 use crate::utils::bit_value_ops::to_u64;
@@ -24,7 +24,7 @@ impl Tree {
     fn get_count(&self) -> u64 {
         match self {
             &Leaf(n, _) => n,
-            &Node(n, _, _) => n
+            &Node(n, _, _) => n,
         }
     }
     fn new_node() -> Tree {
@@ -58,9 +58,11 @@ impl PartialEq for Tree {
 /// make a code tree
 pub fn make_tree(freq_table: &Vec<u64>) -> Tree {
     let mut que = BinaryHeap::new();
-    for x in 0 .. freq_table.len() {
+    for x in 0..freq_table.len() {
         let cnt = freq_table[x];
-        if cnt > 0 { que.push(Leaf(cnt, x as u64)); }
+        if cnt > 0 {
+            que.push(Leaf(cnt, x as u64));
+        }
     }
     if que.len() == 1 {
         if let Some(&Leaf(_, x)) = que.peek() {
@@ -70,7 +72,9 @@ pub fn make_tree(freq_table: &Vec<u64>) -> Tree {
     }
     loop {
         let n = que.pop().unwrap();
-        if que.is_empty() { return n; }
+        if que.is_empty() {
+            return n;
+        }
         let m = que.pop().unwrap();
         let node = Node(n.get_count() + m.get_count(), Box::new(n), Box::new(m));
         que.push(node);
@@ -83,7 +87,7 @@ pub fn print_tree(node: &Tree, code: &mut Vec<u32>) {
         &Leaf(_, c) => {
             print_space(code.len());
             println!("* {}, {:?}", c, code);
-        },
+        }
         &Node(_, ref left, ref right) => {
             code.push(0);
             print_tree(left, code);
@@ -127,7 +131,6 @@ fn make_code_sub(tree: &Tree, n: u64, code: u64, table: &mut HashMap<u64, (u64, 
     }
 }
 
-
 /// search code from a code tree
 pub fn search_code(tree: &Tree, mut src: Vec<bool>) -> (u64, Vec<bool>) {
     let mut node = tree;
@@ -135,9 +138,13 @@ pub fn search_code(tree: &Tree, mut src: Vec<bool>) -> (u64, Vec<bool>) {
         match &node {
             &Tree::Leaf(_, c) => return (*c, src),
             &Tree::Node(_, left, right) => {
-                node = if src.remove(0) == false { &left } else { &right };
+                node = if src.remove(0) == false {
+                    &left
+                } else {
+                    &right
+                };
             }
-        } 
+        }
     }
 }
 
@@ -148,7 +155,7 @@ pub fn tree_to_bits(tree: &Tree, n_bits: u64) -> Vec<bool> {
         &Leaf(_, c) => {
             dst.push(true);
             dst.append(&mut to_n_bits(*c, n_bits))
-        },
+        }
         &Node(_, left, right) => {
             dst.push(false);
             dst.append(&mut tree_to_bits(&left, n_bits));
