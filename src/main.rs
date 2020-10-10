@@ -2,17 +2,31 @@
 
 extern crate rs_compress;
 use rs_compress as rsc;
-// use rsc::shannon_fano_encoding::node_tree::*;
 use rsc::utils::bit_value_ops::to_string;
-// use rsc::utils::byte_array_ops as byteops;
 
-// use bit_vec::BitVec;
 use rand::prelude::*;
-// use std::rc::Rc;
 use std::collections::BTreeMap;
 use std::ops::Bound::Included;
 
 fn main() {
+    test_print_huffman_tree();
+}
+
+fn test_print_huffman_tree() {
+    // let code: Vec<u8> = vec![7, 6, 5, 4, 3, 2, 1, 0];
+    // let counts: Vec<u32> = vec![8, 8, 4, 4, 2, 2, 1, 1];
+    // let mut src: Vec<u8> = Vec::new();
+    // for ii in 0..code.len() {
+    //     for _ in 0..counts[ii] {
+    //         src.push(code[ii]);
+    //     }
+    // }
+    let src: String = String::from("abccddeeeeffffgggggggghhhhhhhh");
+    let _encoded: Vec<bool> = rsc::huffman_encoding::encode(&src.as_bytes());
+}
+
+#[allow(dead_code)]
+fn test_b_tree_map() {
     let mut tree: BTreeMap<u32, u32> = BTreeMap::new();
     for ii in 0..256 {
         tree.insert(ii, 0);

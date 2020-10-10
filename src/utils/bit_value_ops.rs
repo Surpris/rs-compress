@@ -40,6 +40,19 @@ pub fn to_u32(src: &[bool]) -> u32 {
     value
 }
 
+/// convert a bit array into a usize value
+pub fn to_u64(src: &[bool]) -> u64 {
+    let size: usize = 8 * size_of::<u64>();
+    assert_eq!(src.len(), size);
+    let mut value: u64 = 0;
+    for jj in 0..size {
+        if src[jj] == true {
+            value += 2u64.pow((size - jj - 1) as u32);
+        }
+    }
+    value
+}
+
 /// convert a bit array into a string
 /// with binary expression
 pub fn to_string(src: &[bool]) -> String {
