@@ -9,9 +9,16 @@ use rsc::utils::bit_value_ops::to_string;
 // use bit_vec::BitVec;
 use rand::prelude::*;
 // use std::rc::Rc;
+use std::collections::BTreeMap;
+use std::ops::Bound::Included;
 
 fn main() {
-    test_shannon_fano_increment(259);
+    let mut tree: BTreeMap<u32, u32> = BTreeMap::new();
+    for ii in 0..256 {
+        tree.insert(ii, 0);
+    }
+    let lower: Vec<(u32, u32)> = tree.range((Included(&0), Included(&128))).map(|(&k, &v)| (k, v)).collect();
+    println!("{:?}",  lower);
 }
 
 #[allow(dead_code)]
@@ -36,6 +43,7 @@ fn test_shannon_fano_simple() {
     println!("{:?}, {}", decoded, to_string(&residual));
 }
 
+#[allow(dead_code)]
 fn test_shannon_fano_increment(n: u32) {
     let mut a: Vec<u8> = Vec::new();
     for ii in 0..n {
