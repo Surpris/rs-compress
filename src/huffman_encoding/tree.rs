@@ -128,34 +128,34 @@ fn make_code_sub(tree: &Tree, n: u64, code: u64, table: &mut HashMap<u64, (u64, 
 }
 
 /// convert a code tree into a bit array
-pub fn tree_to_bits(tree: &Tree, bits: u64) -> Vec<bool> {
+pub fn tree_to_bits(tree: &Tree, n_bits: u64) -> Vec<bool> {
     let mut dst: Vec<bool> = Vec::new();
     match &tree {
         &Leaf(_, c) => {
             dst.push(true);
-            dst.append(&mut to_n_bits(*c, bits))
+            dst.append(&mut to_n_bits(*c, n_bits))
         },
         &Node(_, left, right) => {
             dst.push(false);
-            dst.append(&mut tree_to_bits(&left, bits));
-            dst.append(&mut tree_to_bits(&right, bits));
+            dst.append(&mut tree_to_bits(&left, n_bits));
+            dst.append(&mut tree_to_bits(&right, n_bits));
         }
     }
     dst
 }
 
 /// convert a part of a bit array into a code tree
-pub fn bits_to_tree(mut bits: Vec<bool>) -> (Tree, Vec<bool>) {
+pub fn bits_to_tree(mut bits: Vec<bool>, n_bits: u64) -> (Tree, Vec<bool>) {
     let bit_: bool = bits.remove(0);
     if bit_ == true {
         let mut code_bits: Vec<bool> = Vec::new();
-        for _ in 0..8 {
+        for _ in 0..n_bits {
             code_bits.push(bits.remove(0));
         }
         (Leaf(0, to_u64(&code_bits)), bits)
     } else {
-        let (left, bits): (Tree, Vec<bool>) = bits_to_tree(bits);
-        let (right, bits): (Tree, Vec<bool>) = bits_to_tree(bits);
+        let (left, bits): (Tree, Vec<bool>) = bits_to_tree(bits, n_bits);
+        let (right, bits): (Tree, Vec<bool>) = bits_to_tree(bits, n_bits);
         (Node(0, Box::new(left), Box::new(right)), bits)
     }
 }

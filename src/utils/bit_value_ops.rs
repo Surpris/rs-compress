@@ -42,8 +42,9 @@ pub fn to_u32(src: &[bool]) -> u32 {
 
 /// convert a bit array into a usize value
 pub fn to_u64(src: &[bool]) -> u64 {
-    let size: usize = 8 * size_of::<u64>();
-    assert_eq!(src.len(), size);
+    // let size: usize = 8 * size_of::<u64>();
+    // assert_eq!(src.len(), size);
+    let size: usize = src.len();
     let mut value: u64 = 0;
     for jj in 0..size {
         if src[jj] == true {

@@ -9,10 +9,10 @@ use std::collections::BTreeMap;
 use std::ops::Bound::Included;
 
 fn main() {
-    test_print_huffman_tree();
+    test_huffman_encoding();
 }
 
-fn test_print_huffman_tree() {
+fn test_huffman_encoding() {
     // let code: Vec<u8> = vec![7, 6, 5, 4, 3, 2, 1, 0];
     // let counts: Vec<u32> = vec![8, 8, 4, 4, 2, 2, 1, 1];
     // let mut src: Vec<u8> = Vec::new();
@@ -22,7 +22,10 @@ fn test_print_huffman_tree() {
     //     }
     // }
     let src: String = String::from("abccddeeeeffffgggggggghhhhhhhh");
-    let _encoded: Vec<bool> = rsc::huffman_encoding::encode(&src.as_bytes());
+    let encoded: Vec<bool> = rsc::huffman_encoding::encode(&src.as_bytes());
+    let (decoded, encoded): (Vec<u8>, Vec<bool>) = rsc::huffman_encoding::decode(encoded);
+    println!("{}", decoded.iter().map(|&s| s as char).collect::<String>());
+    println!("{:?}", encoded);
 }
 
 #[allow(dead_code)]
