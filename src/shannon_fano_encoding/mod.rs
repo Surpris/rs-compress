@@ -34,7 +34,7 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
         total += n_.count;
         x += 1;
     }
-    println!("{}, {}", total, x);
+    // println!("{}, {}", total, x);
     let mut node_table: Vec<Rc<Node>> = node_table.into_iter().map(|x| Rc::new(x)).collect();
     let mut root: Rc<Node> = Rc::new(Node::new());
     if x < 2 {
@@ -62,7 +62,7 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
 
     // output the code table
     for v in src.to_vec() {
-        println!("{}, {:?}", v, code_table[v as usize]);
+        // println!("{}, {:?}", v, code_table[v as usize]);
         dst.append(&mut u32_value_ops::to_n_bits(
             code_table[v as usize].1 as u32,
             code_table[v as usize].0,

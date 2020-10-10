@@ -12,15 +12,23 @@ fn main() {
     test_huffman_encoding();
 }
 
+#[allow(dead_code)]
 fn test_huffman_encoding() {
-    // let code: Vec<u8> = vec![7, 6, 5, 4, 3, 2, 1, 0];
-    // let counts: Vec<u32> = vec![8, 8, 4, 4, 2, 2, 1, 1];
-    // let mut src: Vec<u8> = Vec::new();
-    // for ii in 0..code.len() {
-    //     for _ in 0..counts[ii] {
-    //         src.push(code[ii]);
-    //     }
-    // }
+    let mut rng = rand::thread_rng();
+    let mut a = [0u8; 1024];
+    rng.fill_bytes(&mut a);
+    // println!("{:?}", a.to_vec());
+    let encoded: Vec<bool> = rsc::huffman_encoding::encode(&a);
+    // println!("{}, {}", to_string(&encoded), encoded.len());
+    let (decoded, _residual): (Vec<u8>, Vec<bool>) = rsc::huffman_encoding::decode(encoded);
+    println!("{}", to_string(&_residual));
+    // println!("{:?}, {}", decoded, to_string(&residual));
+    println!("{}, {}", a.len(), decoded.len());
+    assert_eq!(a.to_vec(), decoded);
+}
+
+#[allow(dead_code)]
+fn test_huffman_encoding_1() {
     let src: String = String::from("abccddeeeeffffgggggggghhhhhhhh");
     let encoded: Vec<bool> = rsc::huffman_encoding::encode(&src.as_bytes());
     let (decoded, encoded): (Vec<u8>, Vec<bool>) = rsc::huffman_encoding::decode(encoded);

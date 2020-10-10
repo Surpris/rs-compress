@@ -127,6 +127,20 @@ fn make_code_sub(tree: &Tree, n: u64, code: u64, table: &mut HashMap<u64, (u64, 
     }
 }
 
+
+/// search code from a code tree
+pub fn search_code(tree: &Tree, mut src: Vec<bool>) -> (u64, Vec<bool>) {
+    let mut node = tree;
+    loop {
+        match &node {
+            &Tree::Leaf(_, c) => return (*c, src),
+            &Tree::Node(_, left, right) => {
+                node = if src.remove(0) == false { &left } else { &right };
+            }
+        } 
+    }
+}
+
 /// convert a code tree into a bit array
 pub fn tree_to_bits(tree: &Tree, n_bits: u64) -> Vec<bool> {
     let mut dst: Vec<bool> = Vec::new();
