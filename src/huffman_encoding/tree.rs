@@ -27,9 +27,11 @@ impl Tree {
             &Node(n, _, _) => n,
         }
     }
+    #[allow(dead_code)]
     fn new_node() -> Tree {
         Node(0, Box::new(Leaf(0, 0)), Box::new(Leaf(0, 0)))
     }
+    #[allow(dead_code)]
     fn new_leaf() -> Tree {
         Leaf(0, 0)
     }
