@@ -2,6 +2,7 @@
 //!
 //!
 
+use crate::utils::u64_value_ops;
 use std::collections::HashMap;
 
 // length of bits expressing the length of target
@@ -11,7 +12,7 @@ const MIN_LEN_OF_TARGET: usize = 3;
 // maximum length of target to encode
 // = MIN_LEN_OF_TARGET + 2**LEN_OF_BITS - 1
 const MAX_LEN_OF_TARGET: usize = 18;
-// length of bits expressin the position of an encoding slide
+// length of bits expressing the position of an encoding slide
 const POSITION_BITS: u64 = 13;
 // length of window
 const WINDOW_LEN: usize = 1 << POSITION_BITS;
@@ -81,6 +82,8 @@ fn get_matched_pattern(
     } else {
         start_point - WINDOW_LEN
     };
+    *match_len = 0;
+    *match_pos = 0;
     if let Some(matched) = ht.get(&hv) {
         let mut nbr = *matched;
         while nbr != NIL && nbr >= limit {
@@ -120,14 +123,12 @@ fn get_matched_pattern(
 /// * match_len
 /// * match_pos
 fn update_values(
-    src: &[u8],
+    src: &mut Vec<u8>,
     buff: &mut [u8],
     next_pos: &mut [usize],
     ht: &mut HashMap<u64, usize>,
     data_size: &mut usize,
     start_point: &mut usize,
-    match_len: &mut usize,
-    match_pos: &mut usize,
 ) {
     if *data_size < WINDOW_LIMIT + MAX_LEN_OF_TARGET {
         return;
@@ -136,14 +137,17 @@ fn update_values(
         buff[ii] = buff[ii + WINDOW_LEN];
     }
     let mut size_: usize = LEN_OF_MOVING;
-    while size_ < LEN_OF_MOVING + src.len() {
-        buff[size_] = src[size_ - LEN_OF_MOVING];
+    for ii in LEN_OF_MOVING..(LEN_OF_MOVING + src.len()) {
+        buff[ii] = src.remove(0);
         size_ += 1;
-        if size_ > buff.len() {
+        if size_ >= buff.len() {
+            break;
+        }
+        if src.len() == 0 {
             break;
         }
     }
-    *data_size = size_ - 1;
+    *data_size = size_;
 
     let mut remove_keys: Vec<u64> = Vec::new();
     for (k, v) in ht.iter_mut() {
@@ -168,7 +172,74 @@ fn update_values(
 }
 
 pub fn encode(src: &[u8]) -> Vec<bool> {
-    Vec::new()
+    if src.len() == 0 {
+        return Vec::new();
+    }
+    // initialize
+    let mut src_vec: Vec<u8> = src.to_vec();
+    let mut start_point: usize = 0;
+    let mut match_len: usize = 0;
+    let mut match_pos: usize = 0;
+    let mut next_pos: [usize; WINDOW_LEN] = [0; WINDOW_LEN];
+    let mut ht: HashMap<u64, usize> = HashMap::new();
+    let mut dst: Vec<bool> = u64_value_ops::to_bits(src.len() as u64);
+
+    // first buffering
+    let mut buff: [u8; NIL] = [0u8; NIL];
+    let mut data_size: usize = 0;
+    for ii in 0..NIL {
+        buff[ii] = src_vec.remove(0);
+        data_size += 1;
+        if src_vec.len() == 0 {
+            break;
+        }
+    }
+
+    // main loop
+    while start_point < data_size {
+        let num: usize;
+        get_matched_pattern(
+            &buff,
+            &next_pos,
+            &ht,
+            data_size,
+            start_point,
+            &mut match_len,
+            &mut match_pos,
+        );
+        if match_len < MIN_LEN_OF_TARGET {
+            num = 1;
+            dst.push(false);
+            dst.append(&mut u64_value_ops::to_n_bits(buff[start_point] as u64, 8));
+        } else {
+            num = match_len;
+            dst.push(true);
+            dst.append(&mut u64_value_ops::to_n_bits(
+                (num - MIN_LEN_OF_TARGET) as u64,
+                LEN_OF_BITS,
+            ));
+            dst.append(&mut u64_value_ops::to_n_bits(
+                (start_point - match_pos - 1) as u64,
+                POSITION_BITS,
+            ));
+        }
+
+        for _ in 0..num {
+            insert_recode(&buff, &mut next_pos, &mut ht, start_point);
+            start_point += 1;
+            if start_point >= WINDOW_LIMIT {
+                update_values(
+                    &mut src_vec,
+                    &mut buff,
+                    &mut next_pos,
+                    &mut ht,
+                    &mut data_size,
+                    &mut start_point,
+                )
+            }
+        }
+    }
+    dst
 }
 
 pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
