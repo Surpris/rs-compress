@@ -17,11 +17,13 @@ const POSITION_BITS: u64 = 13;
 const WINDOW_LEN: usize = 1 << POSITION_BITS;
 // limit of window size
 const WINDOW_LIMIT: usize = WINDOW_LEN * 2;
+// length of (ref + target)
+const LEN_OF_MOVING: usize = WINDOW_LEN + MAX_LEN_OF_TARGET;
 // buffer size
 const NIL: usize = WINDOW_LIMIT + MAX_LEN_OF_TARGET;
 
 /// get the hash value corresponding to the starting point of encoding
-/// 
+///
 /// # Parameters
 /// * buff: buffer for encoding
 /// * start_point: starting point of encoding
@@ -34,7 +36,7 @@ fn get_hash_value(buff: &[u8], start_point: usize) -> u64 {
 }
 
 /// insert a recode including the starting point to a hash table
-/// 
+///
 /// # Parameters
 /// * buff: buffer for encoding
 /// * next_pos: connected list of the starting points
@@ -55,7 +57,7 @@ fn insert_recode(
 }
 
 /// get the matched pattern
-/// 
+///
 /// # Parameters
 /// * buff
 /// * next_pos
@@ -74,7 +76,11 @@ fn get_matched_pattern(
     match_pos: &mut usize,
 ) {
     let hv: u64 = get_hash_value(buff, start_point);
-    let limit: usize = if start_point < WINDOW_LEN { 0 } else {start_point - WINDOW_LEN};
+    let limit: usize = if start_point < WINDOW_LEN {
+        0
+    } else {
+        start_point - WINDOW_LEN
+    };
     if let Some(matched) = ht.get(&hv) {
         let mut nbr = *matched;
         while nbr != NIL && nbr >= limit {
@@ -103,7 +109,7 @@ fn get_matched_pattern(
 }
 
 /// update inner parameters
-/// 
+///
 /// # Parameters
 /// * src
 /// * buff
@@ -123,7 +129,42 @@ fn update_values(
     match_len: &mut usize,
     match_pos: &mut usize,
 ) {
+    if *data_size < WINDOW_LIMIT + MAX_LEN_OF_TARGET {
+        return;
+    }
+    for ii in 0..LEN_OF_MOVING {
+        buff[ii] = buff[ii + WINDOW_LEN];
+    }
+    let mut size_: usize = LEN_OF_MOVING;
+    while size_ < LEN_OF_MOVING + src.len() {
+        buff[size_] = src[size_ - LEN_OF_MOVING];
+        size_ += 1;
+        if size_ > buff.len() {
+            break;
+        }
+    }
+    *data_size = size_ - 1;
 
+    let mut remove_keys: Vec<u64> = Vec::new();
+    for (k, v) in ht.iter_mut() {
+        if *v < WINDOW_LEN {
+            remove_keys.push(*k);
+        } else if *v != NIL {
+            *v -= WINDOW_LEN;
+        }
+    }
+    for k in remove_keys {
+        ht.remove(&k);
+    }
+
+    for ii in 0..WINDOW_LEN {
+        if next_pos[ii] != NIL && next_pos[ii] > WINDOW_LEN {
+            next_pos[ii] -= WINDOW_LEN;
+        } else {
+            next_pos[ii] = NIL;
+        }
+    }
+    *start_point = *start_point - WINDOW_LEN;
 }
 
 pub fn encode(src: &[u8]) -> Vec<bool> {
