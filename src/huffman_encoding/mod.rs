@@ -34,7 +34,7 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
     // output the code table
     for v in src.to_vec() {
         let &(code, n) = code_table.get(&(v as u64)).unwrap();
-        println!("{}, {}, {}", v, code, n);
+        // println!("{}, {}, {}", v, code, n);
         dst.append(&mut u64_value_ops::to_n_bits(code, n));
     }
 
