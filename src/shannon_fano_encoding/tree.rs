@@ -4,8 +4,9 @@
 
 use std::boxed::Box;
 use std::cmp::Ordering;
-use std::collections::{BTreeMap, HashMap};
-use std::ops::Bound::{Included, Unbounded};
+use std::collections::BTreeMap;
+// use std::collections::{BTreeMap, HashMap};
+// use std::ops::Bound::{Included, Unbounded};
 
 pub const NBR_OF_CHARS: usize = 256;
 
@@ -28,6 +29,7 @@ impl Tree {
     fn new_node() -> Tree {
         Node(0, Box::new(Leaf(0, 0)), Box::new(Leaf(0, 0)))
     }
+    #[allow(dead_code)]
     fn new_leaf() -> Tree {
         Leaf(0, 0)
     }
@@ -72,10 +74,11 @@ pub fn make_tree(freq_table: &Vec<u64>) -> Tree {
             leaf_map.insert(total + 1, Leaf(0, c));
         }
     }
-    let mut root: Tree = Tree::new_node();
+    let root: Tree = Tree::new_node();
     root
 }
 
+#[allow(dead_code)]
 fn make_tree_step(leaf_map: &BTreeMap<u64, Tree>) -> Tree {
     let keys: Vec<_> = leaf_map.keys().cloned().collect();
     if keys.len() == 1 {
@@ -85,7 +88,7 @@ fn make_tree_step(leaf_map: &BTreeMap<u64, Tree>) -> Tree {
             panic!();
         }
     }
-    let center: u64 = (keys[0] + keys[keys.len() - 1]) / 2;
+    let _center: u64 = (keys[0] + keys[keys.len() - 1]) / 2;
 
     // TODO:
     // 1. check how to implement Copy trait
