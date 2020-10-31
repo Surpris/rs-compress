@@ -62,6 +62,19 @@ fn walk_and_encode(path: &Path) -> io::Result<()> {
 }
 
 #[allow(dead_code)]
+fn test_integer_encoding() {
+    for ii in 0..255 {
+        let encoded: Vec<bool> = rsc::integer_encoding::delta::encode::<u64>(ii as u64);
+        let encoded_u8: Vec<bool> = rsc::integer_encoding::delta::encode_u8(ii as u8);
+        assert_eq!(encoded, encoded_u8);
+        let (decoded, _res) = rsc::integer_encoding::delta::decode::<u64>(encoded.clone());
+        let (decoded_u8, _res) = rsc::integer_encoding::delta::decode_u8(encoded);
+        assert_eq!(ii, decoded_u8);
+        assert_eq!(ii, decoded as u8);
+    }
+}
+
+#[allow(dead_code)]
 fn test_with_random_values() {
     let mut rng = rand::thread_rng();
     let mut a = [0u8; 1024];

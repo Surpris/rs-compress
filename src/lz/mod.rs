@@ -2,4 +2,5 @@
 //!
 //!
 
+pub mod lzb;
 pub mod lzss;
