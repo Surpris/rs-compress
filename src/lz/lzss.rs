@@ -244,10 +244,8 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
 }
 
 pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
-    if src.len() == 0 {
+    if src.len() < 64 {
         return (Vec::new(), src);
-    } else if src.len() < 64 {
-        panic!();
     }
     let mut buff: Vec<bool> = Vec::new();
     for _ in 0..64 {

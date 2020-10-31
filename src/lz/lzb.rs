@@ -8,7 +8,7 @@ use crate::utils::u64_value_ops;
 use std::collections::HashMap;
 
 // length of bits expressing the length of target
-const LEN_OF_BITS: u64 = 4;
+// const LEN_OF_BITS: u64 = 4;
 // minimum length of target to encode
 const MIN_LEN_OF_TARGET: usize = 3;
 // maximum length of target to encode
@@ -211,11 +211,11 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
         );
         if match_len < MIN_LEN_OF_TARGET {
             num = 1;
-            dst.append(&mut gamma::encode(0u8));
+            dst.append(&mut gamma::encode(0u64));
             dst.append(&mut u64_value_ops::to_n_bits(buff[start_point] as u64, 8));
         } else {
             num = match_len;
-            // dst.append(&mut gamma::encode((num - MIN_LEN_OF_TARGET + 1) as u64));
+            dst.append(&mut gamma::encode((num - MIN_LEN_OF_TARGET + 1) as u64));
             dst.append(&mut u64_value_ops::to_n_bits(
                 (start_point - match_pos - 1) as u64,
                 POSITION_BITS,
@@ -241,10 +241,8 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
 }
 
 pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
-    if src.len() == 0 {
+    if src.len() < 64 {
         return (Vec::new(), src);
-    } else if src.len() < 64 {
-        panic!();
     }
     let mut buff: Vec<bool> = Vec::new();
     for _ in 0..64 {
@@ -255,16 +253,12 @@ pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
     let mut start_point: usize = 0;
     let mut dst: Vec<u8> = Vec::new();
     while size > 0 {
-        let num: u64;
-        if src.remove(0) == true {
-            buff = Vec::new();
-            for _ in 0..LEN_OF_BITS {
-                buff.push(src.remove(0));
-            }
-            num = bit_value_ops::to_u64(&buff) + MIN_LEN_OF_TARGET as u64;
+        let (mut num, mut src_2) = gamma::decode::<u64>(src);
+        if num > 0 {
+            num = num - 1 + MIN_LEN_OF_TARGET as u64;
             buff = Vec::new();
             for _ in 0..POSITION_BITS {
-                buff.push(src.remove(0));
+                buff.push(src_2.remove(0));
             }
             let mut pos: usize = (bit_value_ops::to_u64(&buff) + 1) as usize;
             pos = if start_point >= pos {
@@ -289,7 +283,7 @@ pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
             num = 1;
             buff = Vec::new();
             for _ in 0..8 {
-                buff.push(src.remove(0));
+                buff.push(src_2.remove(0));
             }
             let c: u8 = bit_value_ops::to_u64(&buff) as u8;
             dst.push(c);
@@ -300,6 +294,7 @@ pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
             }
         }
         size -= num;
+        src = src_2.clone();
     }
     (dst, src)
 }

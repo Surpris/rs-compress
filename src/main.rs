@@ -28,6 +28,7 @@ fn test_with_file() {
     }
 }
 
+#[allow(dead_code)]
 fn walk_and_encode(path: &Path) -> io::Result<()> {
     if path.is_dir() {
         let mut entries = fs::read_dir(path)?
@@ -38,27 +39,25 @@ fn walk_and_encode(path: &Path) -> io::Result<()> {
             if entry.is_dir() {
                 walk_and_encode(&entry)?;
             } else {
-                let mut file = File::open(entry.to_str().unwrap()).unwrap();
-                let mut src: Vec<u8> = Vec::new();
-                let _ = file.read_to_end(&mut src);
-                let encoded: Vec<bool> = rsc::lz::lzss::encode(&src);
-                println!("{}, {}", entry.to_str().unwrap(), encoded.len() / 8);
-                let (decoded, residual): (Vec<u8>, Vec<bool>) = rsc::lz::lzss::decode(encoded);
-                println!("{}, {}, {}", src.len(), decoded.len(), to_string(&residual));
-                assert_eq!(src, decoded);
+                encode_decode(&entry);
             }
         }
     } else {
-        let mut file = File::open(path.to_str().unwrap()).unwrap();
-        let mut src: Vec<u8> = Vec::new();
-        let _ = file.read_to_end(&mut src);
-        let encoded: Vec<bool> = rsc::lz::lzss::encode(&src);
-        println!("{}, {}", path.to_str().unwrap(), encoded.len() / 8);
-        let (decoded, residual): (Vec<u8>, Vec<bool>) = rsc::lz::lzss::decode(encoded);
-        println!("{}, {}, {}", src.len(), decoded.len(), to_string(&residual));
-        assert_eq!(src, decoded);
+        encode_decode(&path);
     }
     Ok(())
+}
+
+#[allow(dead_code)]
+fn encode_decode(path: &Path) {
+    let mut file = File::open(path.to_str().unwrap()).unwrap();
+    let mut src: Vec<u8> = Vec::new();
+    let _ = file.read_to_end(&mut src);
+    let encoded: Vec<bool> = rsc::lz::lzb::encode(&src);
+    println!("{}, {}", path.to_str().unwrap(), encoded.len() / 8);
+    let (decoded, residual): (Vec<u8>, Vec<bool>) = rsc::lz::lzb::decode(encoded);
+    println!("{}, {}, {}", src.len(), decoded.len(), residual.len());
+    assert_eq!(src, decoded);
 }
 
 #[allow(dead_code)]
