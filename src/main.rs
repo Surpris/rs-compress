@@ -43,8 +43,20 @@ fn walk_and_encode(path: &Path) -> io::Result<()> {
                 let _ = file.read_to_end(&mut src);
                 let encoded: Vec<bool> = rsc::lz::lzss::encode(&src);
                 println!("{}, {}", entry.to_str().unwrap(), encoded.len() / 8);
+                let (decoded, residual): (Vec<u8>, Vec<bool>) = rsc::lz::lzss::decode(encoded);
+                println!("{}, {}, {}", src.len(), decoded.len(), to_string(&residual));
+                assert_eq!(src, decoded);
             }
         }
+    } else {
+        let mut file = File::open(path.to_str().unwrap()).unwrap();
+        let mut src: Vec<u8> = Vec::new();
+        let _ = file.read_to_end(&mut src);
+        let encoded: Vec<bool> = rsc::lz::lzss::encode(&src);
+        println!("{}, {}", path.to_str().unwrap(), encoded.len() / 8);
+        let (decoded, residual): (Vec<u8>, Vec<bool>) = rsc::lz::lzss::decode(encoded);
+        println!("{}, {}, {}", src.len(), decoded.len(), to_string(&residual));
+        assert_eq!(src, decoded);
     }
     Ok(())
 }
