@@ -2,6 +2,7 @@
 //!
 //!
 
+use crate::utils::bit_value_ops;
 use crate::utils::u64_value_ops;
 use std::collections::HashMap;
 
@@ -243,5 +244,65 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
 }
 
 pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
-    (Vec::new(), src)
+    if src.len() == 0 {
+        return (Vec::new(), src);
+    } else if src.len() < 64 {
+        panic!();
+    }
+    let mut buff: Vec<bool> = Vec::new();
+    for _ in 0..64 {
+        buff.push(src.remove(0));
+    }
+    let mut size = bit_value_ops::to_u64(&buff);
+    let mut buffer = [0u8; WINDOW_LEN];
+    let mut start_point: usize = 0;
+    let mut dst: Vec<u8> = Vec::new();
+    while size > 0 {
+        let num: u64;
+        if src.remove(0) == true {
+            buff = Vec::new();
+            for _ in 0..LEN_OF_BITS {
+                buff.push(src.remove(0));
+            }
+            num = bit_value_ops::to_u64(&buff) + MIN_LEN_OF_TARGET as u64;
+            buff = Vec::new();
+            for _ in 0..POSITION_BITS {
+                buff.push(src.remove(0));
+            }
+            let mut pos: usize = (bit_value_ops::to_u64(&buff) + 1) as usize;
+            pos = if start_point >= pos {
+                start_point - pos
+            } else {
+                start_point + WINDOW_LEN - pos
+            };
+            for _ in 0..num {
+                let c = buffer[pos];
+                dst.push(c);
+                buffer[start_point] = c;
+                pos += 1;
+                start_point += 1;
+                if pos >= WINDOW_LEN {
+                    pos = 0;
+                }
+                if start_point >= WINDOW_LEN {
+                    start_point = 0;
+                }
+            }
+        } else {
+            num = 1;
+            buff = Vec::new();
+            for _ in 0..8 {
+                buff.push(src.remove(0));
+            }
+            let c: u8 = bit_value_ops::to_u64(&buff) as u8;
+            dst.push(c);
+            buffer[start_point] = c;
+            start_point += 1;
+            if start_point >= WINDOW_LEN {
+                start_point = 0;
+            }
+        }
+        size -= num;
+    }
+    (dst, src)
 }
