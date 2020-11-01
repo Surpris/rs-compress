@@ -13,7 +13,8 @@ use std::path::Path;
 
 fn main() {
     // test_with_file();
-    test_with_random_values();
+    // test_with_random_values();
+    test_bits_to_values();
 }
 
 #[allow(dead_code)]
@@ -93,4 +94,27 @@ fn test_with_string() {
     let (decoded, encoded): (Vec<u8>, Vec<bool>) = rsc::huffman_encoding::decode(encoded);
     println!("{}", decoded.iter().map(|&s| s as char).collect::<String>());
     println!("{:?}", encoded);
+}
+
+#[allow(dead_code)]
+fn test_bits_to_values() {
+    // let mut rng = rand::thread_rng();
+    let mut a = [0u64; 1024];
+    rng_fill_u64(&mut a);
+    for v in a.to_vec() {
+        let src = rsc::utils::u64_value_ops::to_bits(v);
+        let src2 = rsc::utils::bit_value_ops::value_to_bits(v);
+        assert_eq!(src, src2);
+        let dst = rsc::utils::bit_value_ops::to_u64(&src);
+        let dst2: u64 = rsc::utils::bit_value_ops::bits_to_value(&src2);
+        assert_eq!(dst, dst2);
+    }
+}
+
+#[allow(dead_code)]
+fn rng_fill_u64(a: &mut [u64]) {
+    let mut rng = rand::thread_rng();
+    for ii in 0..a.len() {
+        a[ii] = rng.next_u64();
+    }
 }
