@@ -7,12 +7,9 @@ use crate::utils::bit_value_ops;
 use crate::utils::u64_value_ops;
 use std::collections::HashMap;
 
-// length of bits expressing the length of target
-// const LEN_OF_BITS: u64 = 4;
 // minimum length of target to encode
 const MIN_LEN_OF_TARGET: usize = 3;
 // maximum length of target to encode
-// = MIN_LEN_OF_TARGET + 2**LEN_OF_BITS - 1
 const MAX_LEN_OF_TARGET: usize = 256;
 // length of bits expressing the position of an encoding slide
 const POSITION_BITS: u64 = 16;
