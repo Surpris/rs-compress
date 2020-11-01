@@ -3,18 +3,17 @@
 //!
 
 use crate::utils::bit_value_ops;
-use crate::utils::u64_value_ops;
 use std::collections::HashMap;
 
 // length of bits expressing the length of target
-const LEN_OF_BITS: u64 = 4;
+const LEN_OF_BITS: usize = 4;
 // minimum length of target to encode
 const MIN_LEN_OF_TARGET: usize = 3;
 // maximum length of target to encode
 // = MIN_LEN_OF_TARGET + 2**LEN_OF_BITS - 1
 const MAX_LEN_OF_TARGET: usize = 18;
 // length of bits expressing the position of an encoding slide
-const POSITION_BITS: u64 = 13;
+const POSITION_BITS: usize = 13;
 // length of window
 const WINDOW_LEN: usize = 1 << POSITION_BITS;
 // limit of window size
@@ -183,7 +182,7 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
     let mut match_pos: usize = 0;
     let mut next_pos: [usize; WINDOW_LEN] = [0; WINDOW_LEN];
     let mut ht: HashMap<u64, usize> = HashMap::new();
-    let mut dst: Vec<bool> = u64_value_ops::to_bits(src.len() as u64);
+    let mut dst: Vec<bool> = bit_value_ops::value_to_bits(src.len() as u64);
 
     // first buffering
     let mut buff: [u8; NIL] = [0u8; NIL];
@@ -211,15 +210,15 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
         if match_len < MIN_LEN_OF_TARGET {
             num = 1;
             dst.push(false);
-            dst.append(&mut u64_value_ops::to_n_bits(buff[start_point] as u64, 8));
+            dst.append(&mut bit_value_ops::value_to_n_bits(buff[start_point] as u64, 8));
         } else {
             num = match_len;
             dst.push(true);
-            dst.append(&mut u64_value_ops::to_n_bits(
+            dst.append(&mut bit_value_ops::value_to_n_bits(
                 (num - MIN_LEN_OF_TARGET) as u64,
                 LEN_OF_BITS,
             ));
-            dst.append(&mut u64_value_ops::to_n_bits(
+            dst.append(&mut bit_value_ops::value_to_n_bits(
                 (start_point - match_pos - 1) as u64,
                 POSITION_BITS,
             ));
@@ -251,23 +250,23 @@ pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
     for _ in 0..64 {
         buff.push(src.remove(0));
     }
-    let mut size = bit_value_ops::to_u64(&buff);
+    let mut size: usize = bit_value_ops::bits_to_value(&buff);
     let mut buffer = [0u8; WINDOW_LEN];
     let mut start_point: usize = 0;
     let mut dst: Vec<u8> = Vec::new();
     while size > 0 {
-        let num: u64;
+        let num: usize;
         if src.remove(0) == true {
             buff = Vec::new();
             for _ in 0..LEN_OF_BITS {
                 buff.push(src.remove(0));
             }
-            num = bit_value_ops::to_u64(&buff) + MIN_LEN_OF_TARGET as u64;
+            num = bit_value_ops::bits_to_value::<usize>(&buff) + MIN_LEN_OF_TARGET;
             buff = Vec::new();
             for _ in 0..POSITION_BITS {
                 buff.push(src.remove(0));
             }
-            let mut pos: usize = (bit_value_ops::to_u64(&buff) + 1) as usize;
+            let mut pos: usize = bit_value_ops::bits_to_value::<usize>(&buff) + 1;
             pos = if start_point >= pos {
                 start_point - pos
             } else {
@@ -292,7 +291,7 @@ pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
             for _ in 0..8 {
                 buff.push(src.remove(0));
             }
-            let c: u8 = bit_value_ops::to_u64(&buff) as u8;
+            let c: u8 = bit_value_ops::bits_to_value(&buff);
             dst.push(c);
             buffer[start_point] = c;
             start_point += 1;

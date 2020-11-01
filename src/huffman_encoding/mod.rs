@@ -5,7 +5,6 @@
 use std::collections::HashMap;
 pub mod tree;
 use crate::utils::bit_value_ops;
-use crate::utils::u64_value_ops;
 use tree::*;
 
 pub const NBR_OF_BITS: u64 = 8;
@@ -26,7 +25,7 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
     let code_table: HashMap<u64, (u64, u64)> = make_code(&tree);
 
     // output the size of the input (bytes)
-    let mut dst = u64_value_ops::to_bits(src.len() as u64);
+    let mut dst = bit_value_ops::value_to_bits(src.len() as u64);
 
     // output the code tree
     dst.append(&mut tree_to_bits(&tree, NBR_OF_BITS));
@@ -35,7 +34,7 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
     for v in src.to_vec() {
         let &(code, n) = code_table.get(&(v as u64)).unwrap();
         // println!("{}, {}, {}", v, code, n);
-        dst.append(&mut u64_value_ops::to_n_bits(code, n));
+        dst.append(&mut bit_value_ops::value_to_n_bits(code, n as usize));
     }
 
     // padding for output in the bytes unit
@@ -58,7 +57,7 @@ pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
     for _ in 0..64 {
         buff.push(src.remove(0));
     }
-    let mut size = bit_value_ops::to_u64(&buff);
+    let mut size: usize = bit_value_ops::bits_to_value(&buff);
 
     // read a code tree
     let (root, mut src) = bits_to_tree(src, NBR_OF_BITS);

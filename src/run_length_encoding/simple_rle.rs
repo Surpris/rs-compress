@@ -6,14 +6,14 @@ const MAX_LEN: usize = 255;
 const MIN_LEN: usize = 3;
 
 /// encode a byte array
-pub fn encode(fin: &[u8], n: usize) -> Vec<u8> {
+pub fn encode(src: &[u8], n: usize) -> Vec<u8> {
     assert!(n >= MIN_LEN, "`n` must be > {}.", MIN_LEN);
     assert!(n <= MAX_LEN, "`n` must be > {}.", MIN_LEN);
 
-    let mut fout: Vec<u8> = Vec::new();
+    let mut dst: Vec<u8> = Vec::new();
     let mut current_index: usize = 0;
-    let mut c: u8 = fin[current_index];
-    while current_index < fin.len() {
+    let mut c: u8 = src[current_index];
+    while current_index < src.len() {
         // number of the same characters in a sequence before another character
         let mut num: usize = 1;
 
@@ -21,10 +21,10 @@ pub fn encode(fin: &[u8], n: usize) -> Vec<u8> {
         let mut c1: u8 = 0;
         while num < MAX_LEN + n {
             current_index += 1;
-            if current_index == fin.len() {
+            if current_index == src.len() {
                 break;
             }
-            c1 = fin[current_index];
+            c1 = src[current_index];
             if c != c1 {
                 break;
             }
@@ -33,19 +33,19 @@ pub fn encode(fin: &[u8], n: usize) -> Vec<u8> {
         // output the encoded values
         if num >= n {
             for _ in 0..n {
-                fout.push(c);
+                dst.push(c);
             }
-            fout.push((num - n) as u8);
+            dst.push((num - n) as u8);
         } else {
             for _ in 0..num {
-                fout.push(c);
+                dst.push(c);
             }
         }
         // set the next character to count
         if num == MAX_LEN + n {
             current_index += 1;
-            if current_index < fin.len() {
-                c = fin[current_index];
+            if current_index < src.len() {
+                c = src[current_index];
             } else {
                 c = c1;
             }
@@ -53,17 +53,17 @@ pub fn encode(fin: &[u8], n: usize) -> Vec<u8> {
             c = c1;
         }
     }
-    fout
+    dst
 }
 
 /// decode an encoded byte array
-pub fn decode(fin: &[u8], n: usize) -> Vec<u8> {
+pub fn decode(src: &[u8], n: usize) -> Vec<u8> {
     assert!(n >= MIN_LEN, "`n` must be > {}.", MIN_LEN);
     assert!(n <= MAX_LEN, "`n` must be > {}.", MIN_LEN);
-    let mut fout: Vec<u8> = Vec::new();
+    let mut dst: Vec<u8> = Vec::new();
     let mut current_index: usize = 0;
-    let mut c: u8 = fin[current_index];
-    while current_index < fin.len() {
+    let mut c: u8 = src[current_index];
+    while current_index < src.len() {
         // number of the same characters in a sequence before another character
         let mut num: usize = 1;
 
@@ -71,10 +71,10 @@ pub fn decode(fin: &[u8], n: usize) -> Vec<u8> {
         let mut c1: u8 = 0;
         while num < n {
             current_index += 1;
-            if current_index == fin.len() {
+            if current_index == src.len() {
                 break;
             }
-            c1 = fin[current_index];
+            c1 = src[current_index];
             if c != c1 {
                 break;
             }
@@ -82,18 +82,18 @@ pub fn decode(fin: &[u8], n: usize) -> Vec<u8> {
         }
         if num == n {
             current_index += 1;
-            if current_index < fin.len() {
-                num += fin[current_index] as usize;
+            if current_index < src.len() {
+                num += src[current_index] as usize;
                 current_index += 1;
-                if current_index < fin.len() {
-                    c1 = fin[current_index];
+                if current_index < src.len() {
+                    c1 = src[current_index];
                 }
             }
         }
         for _ in 0..num {
-            fout.push(c);
+            dst.push(c);
         }
         c = c1;
     }
-    fout
+    dst
 }

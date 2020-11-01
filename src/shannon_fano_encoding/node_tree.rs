@@ -7,7 +7,7 @@ use std::cmp::Ordering;
 use std::rc::Rc;
 use std::rc::Weak;
 
-use crate::utils::bit_value_ops::to_byte;
+use crate::utils::bit_value_ops::bits_to_value;
 use crate::utils::byte_value_ops::to_bits;
 
 pub const MAX_CHAR: usize = 256;
@@ -164,7 +164,7 @@ pub fn bits_to_tree(mut bits: Vec<bool>) -> (Rc<Node>, Vec<bool>) {
         for _ in 0..8 {
             code_bits.push(bits.remove(0));
         }
-        let node = Rc::new(Node::new_with_code(to_byte(&code_bits)));
+        let node = Rc::new(Node::new_with_code(bits_to_value(&code_bits)));
         (node, bits)
     } else {
         let node = Rc::new(Node::new());

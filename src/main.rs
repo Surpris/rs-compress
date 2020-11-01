@@ -12,9 +12,8 @@ use std::io::prelude::*;
 use std::path::Path;
 
 fn main() {
-    // test_with_file();
+    test_with_file();
     // test_with_random_values();
-    test_bits_to_values();
 }
 
 #[allow(dead_code)]
@@ -66,11 +65,11 @@ fn encode_decode(path: &Path) {
 fn test_integer_encoding() {
     for ii in 0..255 {
         let encoded: Vec<bool> = rsc::integer_encoding::delta::encode::<u64>(ii as u64);
-        let encoded_u8: Vec<bool> = rsc::integer_encoding::delta::encode_u8(ii as u8);
-        assert_eq!(encoded, encoded_u8);
+        // let encoded_u8: Vec<bool> = rsc::integer_encoding::delta::encode_u8(ii as u8);
+        // assert_eq!(encoded, encoded_u8);
         let (decoded, _res) = rsc::integer_encoding::delta::decode::<u64>(encoded.clone());
-        let (decoded_u8, _res) = rsc::integer_encoding::delta::decode_u8(encoded);
-        assert_eq!(ii, decoded_u8);
+        // let (decoded_u8, _res) = rsc::integer_encoding::delta::decode_u8(encoded);
+        // assert_eq!(ii, decoded_u8);
         assert_eq!(ii, decoded as u8);
     }
 }
@@ -94,21 +93,6 @@ fn test_with_string() {
     let (decoded, encoded): (Vec<u8>, Vec<bool>) = rsc::huffman_encoding::decode(encoded);
     println!("{}", decoded.iter().map(|&s| s as char).collect::<String>());
     println!("{:?}", encoded);
-}
-
-#[allow(dead_code)]
-fn test_bits_to_values() {
-    // let mut rng = rand::thread_rng();
-    let mut a = [0u64; 1024];
-    rng_fill_u64(&mut a);
-    for v in a.to_vec() {
-        let src = rsc::utils::u64_value_ops::to_bits(v);
-        let src2 = rsc::utils::bit_value_ops::value_to_bits(v);
-        assert_eq!(src, src2);
-        let dst = rsc::utils::bit_value_ops::to_u64(&src);
-        let dst2: u64 = rsc::utils::bit_value_ops::bits_to_value(&src2);
-        assert_eq!(dst, dst2);
-    }
 }
 
 #[allow(dead_code)]

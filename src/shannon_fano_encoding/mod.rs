@@ -84,7 +84,7 @@ pub fn decode(mut src: Vec<bool>) -> (Vec<u8>, Vec<bool>) {
     for _ in 0..32 {
         buff.push(src.remove(0));
     }
-    let mut size = bit_value_ops::to_u32(&buff);
+    let mut size: u32 = bit_value_ops::bits_to_value(&buff);
     // println!("{}", size);
 
     // read a code tree

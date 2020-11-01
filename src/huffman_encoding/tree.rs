@@ -6,8 +6,7 @@ use std::boxed::Box;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
 
-use crate::utils::bit_value_ops::to_u64;
-use crate::utils::u64_value_ops::to_n_bits;
+use crate::utils::bit_value_ops::{bits_to_value, value_to_n_bits};
 
 pub const NBR_OF_CHARS: usize = 256;
 
@@ -160,7 +159,7 @@ pub fn tree_to_bits(tree: &Tree, n_bits: u64) -> Vec<bool> {
     match &tree {
         &Leaf(_, c) => {
             dst.push(true);
-            dst.append(&mut to_n_bits(*c, n_bits))
+            dst.append(&mut value_to_n_bits(*c, n_bits as usize));
         }
         &Node(_, left, right) => {
             dst.push(false);
@@ -179,7 +178,7 @@ pub fn bits_to_tree(mut bits: Vec<bool>, n_bits: u64) -> (Tree, Vec<bool>) {
         for _ in 0..n_bits {
             code_bits.push(bits.remove(0));
         }
-        (Leaf(0, to_u64(&code_bits)), bits)
+        (Leaf(0, bits_to_value(&code_bits)), bits)
     } else {
         let (left, bits): (Tree, Vec<bool>) = bits_to_tree(bits, n_bits);
         let (right, bits): (Tree, Vec<bool>) = bits_to_tree(bits, n_bits);
