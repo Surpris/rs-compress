@@ -273,7 +273,10 @@ fn huffman_encode(buff: &[(u64, u64)], size: usize) -> Vec<bool> {
     let tree_pos = tree::make_tree(&ft_pos);
     let ct_pos = tree::make_code(&tree_pos);
     let mut dst: Vec<bool> = Vec::new();
-    dst.append(&mut u64_value_ops::to_n_bits((size - 1) as u64, NBR_OF_HUFF_BITS));
+    dst.append(&mut u64_value_ops::to_n_bits(
+        (size - 1) as u64,
+        NBR_OF_HUFF_BITS,
+    ));
     dst.append(&mut tree::tree_to_bits(&tree_sym_len, NBR_OF_BITS_SYM_LEN));
     dst.append(&mut tree::tree_to_bits(&tree_pos, NBR_OF_BITS_POS));
     for ii in 0..size {
@@ -282,10 +285,10 @@ fn huffman_encode(buff: &[(u64, u64)], size: usize) -> Vec<bool> {
         dst.append(&mut u64_value_ops::to_n_bits(code, n));
         if sl >= CODE_LEN {
             let bits: u64 = bit_length_of_value(p);
-            let &(code, n) = ct_pos.get(&bits).unwrap();
-            dst.append(&mut u64_value_ops::to_n_bits(code, n));
-            if n > 0 {
-                dst.append(&mut u64_value_ops::to_n_bits(p + 1, n));
+            let &(code_, n_) = ct_pos.get(&bits).unwrap();
+            dst.append(&mut u64_value_ops::to_n_bits(code_, n_));
+            if bits > 0 {
+                dst.append(&mut u64_value_ops::to_n_bits(p + 1, bits));
             }
         }
     }
@@ -363,10 +366,10 @@ fn huffman_decode(mut src: Vec<bool>, huff_buff: &mut [(u64, u64)]) -> (usize, V
     let (tree_pos, mut src) = tree::bits_to_tree(src, NBR_OF_BITS_POS);
     for ii in 0..size {
         let (code, buff) = tree::search_code(&tree_sym_len, src);
-        src = buff;
+        src = buff.clone();
         let p = if code >= CODE_LEN {
             let (n, buff1) = tree::search_code(&tree_pos, src);
-            src = buff1;
+            src = buff1.clone();
             if n > 0 {
                 let mut buff2: Vec<bool> = Vec::new();
                 for _ in 0..n {

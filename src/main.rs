@@ -12,7 +12,8 @@ use std::io::prelude::*;
 use std::path::Path;
 
 fn main() {
-    test_with_file();
+    // test_with_file();
+    test_with_random_values();
 }
 
 #[allow(dead_code)]
@@ -57,7 +58,7 @@ fn encode_decode(path: &Path) {
     println!("{}, {}", path.to_str().unwrap(), encoded.len() / 8);
     let (decoded, residual): (Vec<u8>, Vec<bool>) = rsc::lz::lzh::decode(encoded);
     println!("{}, {}, {}", src.len(), decoded.len(), residual.len());
-    // assert_eq!(src, decoded);
+    assert_eq!(src, decoded);
 }
 
 #[allow(dead_code)]
@@ -78,12 +79,10 @@ fn test_with_random_values() {
     let mut rng = rand::thread_rng();
     let mut a = [0u8; 1024];
     rng.fill_bytes(&mut a);
-    let encoded: Vec<bool> = rsc::huffman_encoding::encode(&a);
-    // println!("{}, {}", to_string(&encoded), encoded.len());
-    let (decoded, residual): (Vec<u8>, Vec<bool>) = rsc::huffman_encoding::decode(encoded);
-    println!("{}", to_string(&residual));
-    // println!("{:?}, {}", decoded, to_string(&residual));
-    println!("{}, {}", a.len(), decoded.len());
+    let encoded: Vec<bool> = rsc::lz::lzh::encode(&a);
+    println!("{}, {}", to_string(&encoded), encoded.len() / 8);
+    let (decoded, residual): (Vec<u8>, Vec<bool>) = rsc::lz::lzh::decode(encoded);
+    println!("{}, {}, {}", a.len(), decoded.len(), residual.len());
     assert_eq!(a.to_vec(), decoded);
 }
 

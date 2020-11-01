@@ -66,6 +66,10 @@ pub fn make_tree(freq_table: &Vec<u64>) -> Tree {
             que.push(Leaf(cnt, x as u64));
         }
     }
+    if que.len() == 0 {
+        que.push(Leaf(0, 0));
+        que.push(Leaf(1, 1));
+    }
     if que.len() == 1 {
         if let Some(&Leaf(_, x)) = que.peek() {
             let c = if x == 0 { 1 } else { 0 };
