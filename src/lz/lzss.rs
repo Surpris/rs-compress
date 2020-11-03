@@ -210,7 +210,10 @@ pub fn encode(src: &[u8]) -> Vec<bool> {
         if match_len < MIN_LEN_OF_TARGET {
             num = 1;
             dst.push(false);
-            dst.append(&mut bit_value_ops::value_to_n_bits(buff[start_point] as u64, 8));
+            dst.append(&mut bit_value_ops::value_to_n_bits(
+                buff[start_point] as u64,
+                8,
+            ));
         } else {
             num = match_len;
             dst.push(true);

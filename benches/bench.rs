@@ -1,7 +1,7 @@
 #![feature(test)]
 
-extern crate test;
 extern crate rs_compress;
+extern crate test;
 use rs_compress as rsc;
 
 use std::fs;

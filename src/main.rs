@@ -10,6 +10,7 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::path::Path;
+use std::time::Instant;
 
 fn main() {
     test_with_file();
