@@ -12,8 +12,20 @@ use std::io::prelude::*;
 use std::path::Path;
 use std::time::Instant;
 
+macro_rules! measure {
+    ( $x:expr) => {{
+        let start = Instant::now();
+        let result = $x;
+        let end = start.elapsed();
+        println!("{}.{:03} sec elapsed.", end.as_secs(), end.subsec_millis());
+        result
+    }};
+}
+
 fn main() {
-    test_with_file();
+    measure!({
+        test_with_file();
+    })
     // test_with_random_values();
 }
 
